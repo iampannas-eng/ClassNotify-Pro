@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายละเอียดวันที่ {{ date }} - ClassNotify Pro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== RESET & GLOBAL ===== */
+        * {
+            box-sizing: border-box;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+            color: #2c3e50;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e8eef5;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .logout-btn {
+            background: white;
+            border: 1px solid #ddd;
+            color: #e74c3c;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+        }
+
+        .logout-btn:hover {
+            background: #fff5f5;
+            border-color: #e74c3c;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 32px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .container-header {
+            margin-bottom: 28px;
+        }
+
+        .container-header h2 {
+            margin: 0 0 8px 0;
+            font-size: 26px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .container-header p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* ===== CARDS ===== */
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: #5B6FFF;
+            box-shadow: 0 2px 8px rgba(91, 111, 255, 0.1);
+        }
+
+        .card-subject {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+
+        .card-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .meta-item {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+
+        .meta-item strong {
+            color: #2c3e50;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .card-detail {
+            font-size: 14px;
+            color: #7f8c8d;
+            line-height: 1.6;
+            padding-top: 12px;
+            border-top: 1px solid #e8eef5;
+        }
+
+        .card-detail strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        /* ===== BACK LINK ===== */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 24px;
+            color: #7f8c8d;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: #5B6FFF;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .header {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .header-left h1 {
+                font-size: 18px;
+            }
+
+            .header-right {
+                width: 100%;
+            }
+
+            .logout-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .container-header h2 {
+                font-size: 22px;
+            }
+
+            .card-meta {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <h1>ClassNotify Pro</h1>
+        </div>
+        <div class="header-right">
+            <button class="logout-btn" onclick="window.location.href='/logout'">🚪 ออกจากระบบ</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+
+        <div class="container-header">
+            <h2>📋 รายการวันที่ {{ date }}</h2>
+            <p>รายละเอียดงานที่ประกาศในวันนี้</p>
+        </div>
+
+        {% if announcements %}
+        <div class="cards-container">
+            {% for row in announcements %}
+            <div class="card">
+                <div class="card-subject">
+                    {{ row.subject_name }}
+                </div>
+
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <strong>ครูผู้สอน</strong>
+                        {{ row.teacher_name }}
+                    </div>
+                    <div class="meta-item">
+                        <strong>ประเภท</strong>
+                        {{ row.type }}
+                    </div>
+                </div>
+
+                <div class="card-detail">
+                    <strong>รายละเอียด:</strong> {{ row.detail }}
+                </div>
+
+                <div class="card-meta" style="margin-top: 12px; margin-bottom: 0;">
+                    <div class="meta-item">
+                        <strong>วันที่ประกาศ</strong>
+                        {{ row.announce_date }}
+                    </div>
+                    <div class="meta-item">
+                        <strong>กำหนดส่ง</strong>
+                        {{ row.due_date }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>✨ ไม่มีข้อมูลสำหรับวันที่นี้</p>
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('history') }}" class="back-link">← กลับหน้าประวัติย้อนหลัง</a>
+
+    </div>
+
+</body>
+
+</html>

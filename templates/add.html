@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เพิ่มรายการงาน - ClassNotify Pro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== RESET & GLOBAL ===== */
+        * {
+            box-sizing: border-box;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+            color: #2c3e50;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e8eef5;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .logout-btn {
+            background: white;
+            border: 1px solid #ddd;
+            color: #e74c3c;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+        }
+
+        .logout-btn:hover {
+            background: #fff5f5;
+            border-color: #e74c3c;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 32px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .container-header {
+            margin-bottom: 28px;
+        }
+
+        .container-header h2 {
+            margin: 0 0 8px 0;
+            font-size: 26px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .container-header p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* ===== FORM ===== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        select,
+        textarea,
+        input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e8eef5;
+            border-radius: 6px;
+            background: white;
+            color: #2c3e50;
+            font-size: 14px;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        select:focus,
+        textarea:focus,
+        input[type="date"]:focus {
+            border-color: #5B6FFF;
+            box-shadow: 0 0 0 3px rgba(91, 111, 255, 0.1);
+        }
+
+        select:hover,
+        textarea:hover,
+        input[type="date"]:hover {
+            border-color: #5B6FFF;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-weight: 400;
+        }
+
+        /* ===== BUTTONS ===== */
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-submit {
+            background: #5B6FFF;
+            color: white;
+            box-shadow: 0 2px 4px rgba(91, 111, 255, 0.2);
+        }
+
+        .btn-submit:hover {
+            background: #4a5ce8;
+            box-shadow: 0 4px 8px rgba(91, 111, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-cancel {
+            background: #f0f3ff;
+            color: #5B6FFF;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e6ff;
+        }
+
+        /* ===== BACK LINK ===== */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 20px;
+            color: #7f8c8d;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: #5B6FFF;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .header {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .header-left h1 {
+                font-size: 18px;
+            }
+
+            .header-right {
+                width: 100%;
+            }
+
+            .logout-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .container-header h2 {
+                font-size: 22px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <h1>ClassNotify Pro</h1>
+        </div>
+        <div class="header-right">
+            <button class="logout-btn" onclick="window.location.href='/logout'">🚪 ออกจากระบบ</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+
+        <div class="container-header">
+            <h2>เพิ่มรายการงาน</h2>
+            <p>กรุณากรอกข้อมูลรายการงานที่ต้องทำ</p>
+        </div>
+
+        <form method="POST">
+
+            <div class="form-group">
+                <label for="type">ประเภทงาน</label>
+                <select name="type" id="type" required>
+                    <option value="">-- เลือกประเภทงาน --</option>
+                    <option value="การบ้าน">การบ้าน</option>
+                    <option value="งานค้าง">งานค้าง</option>
+                    <option value="รายงาน">รายงาน</option>
+                    <option value="โปรเจค">โปรเจค</option>
+                    <option value="สอบเก็บคะแนน">สอบเก็บคะแนน</option>
+                    <option value="สอบกลางภาค">สอบกลางภาค</option>
+                    <option value="สอบปลายภาค">สอบปลายภาค</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="subject_id">วิชา</label>
+                <select name="subject_id" id="subject_id" required>
+                    <option value="">-- เลือกวิชา --</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject.id }}">
+                        {{ subject.subject_name }} ({{ subject.teacher_name }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="detail">รายละเอียด</label>
+                <textarea name="detail" id="detail" required placeholder="กรุณากรอกรายละเอียดของงาน..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="due_date">กำหนดส่ง</label>
+                <input type="date" name="due_date" id="due_date" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-submit">💾 บันทึก</button>
+                <a href="/" class="btn btn-cancel">← ยกเลิก</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>

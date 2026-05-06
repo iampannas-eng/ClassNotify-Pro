@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ClassNotify Pro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+    <style>
+        /* ===== RESET & GLOBAL ===== */
+        * {
+            box-sizing: border-box;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+            color: #2c3e50;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e8eef5;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .logout-btn {
+            background: white;
+            border: 1px solid #ddd;
+            color: #e74c3c;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+        }
+
+        .logout-btn:hover {
+            background: #fff5f5;
+            border-color: #e74c3c;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 0;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* ===== LEFT SECTION - SCHEDULE ===== */
+        .schedule-section {
+            background: white;
+            padding: 24px;
+            border-right: 1px solid #e8eef5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .schedule-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .schedule-img {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .schedule-img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        /* ===== RIGHT SECTION - DASHBOARD ===== */
+        .dashboard-section {
+            background: #f5f7fa;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .dashboard-header {
+            margin-bottom: 24px;
+        }
+
+        .dashboard-header h2 {
+            margin: 0 0 8px 0;
+            font-size: 26px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .dashboard-header p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* ===== MENU BUTTONS ===== */
+        .menu-section {
+            margin-bottom: 24px;
+        }
+
+        .menu-section h3 {
+            margin: 0 0 12px 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .menu a {
+            background: #5B6FFF;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+            box-shadow: 0 2px 4px rgba(91, 111, 255, 0.2);
+        }
+
+        .menu-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .menu a:hover {
+            background: #4a5ce8;
+            box-shadow: 0 4px 8px rgba(91, 111, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* ===== CARDS SECTION ===== */
+        .cards-section {
+            margin-bottom: 24px;
+        }
+
+        .cards-section h3 {
+            margin: 0 0 12px 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .card:hover {
+            border-color: #5B6FFF;
+            box-shadow: 0 4px 12px rgba(91, 111, 255, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .card-badge {
+            background: #f0f3ff;
+            color: #5B6FFF;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .card-content {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 13px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .card-content strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .card-dates {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e8eef5;
+            font-size: 13px;
+        }
+
+        .card-date-item {
+            color: #7f8c8d;
+            font-weight: 400;
+        }
+
+        .card-date-item strong {
+            color: #2c3e50;
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e8eef5;
+        }
+
+        .card-actions a {
+            flex: 1;
+        }
+
+        .card-actions form {
+            flex: 1;
+        }
+
+        .card-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+        }
+
+        .edit-btn {
+            background: #f0f3ff;
+            color: #5B6FFF;
+        }
+
+        .edit-btn:hover {
+            background: #e0e6ff;
+        }
+
+        .delete-btn {
+            background: #fff5f5;
+            color: #e74c3c;
+        }
+
+        .delete-btn:hover {
+            background: #ffe8e8;
+        }
+
+        .empty-state {
+            background: white;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+            padding: 32px 24px;
+            text-align: center;
+            color: #7f8c8d;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* ===== BOTTOM ACTION ===== */
+        .bottom-action {
+            margin-top: 24px;
+        }
+
+        .send-btn {
+            width: 100%;
+            background: #5B6FFF;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(91, 111, 255, 0.2);
+        }
+
+        .send-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .send-icon-img {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            object-fit: contain;
+        }
+
+        .send-btn:hover {
+            background: #4a5ce8;
+            box-shadow: 0 4px 8px rgba(91, 111, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-box {
+            background: white;
+            color: #2c3e50;
+            padding: 24px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 360px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.2s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-box h3 {
+            margin: 0 0 8px 0;
+            font-weight: 600;
+            color: #e74c3c;
+            font-size: 16px;
+        }
+
+        .modal-box p {
+            margin: 0 0 20px 0;
+            color: #7f8c8d;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+        }
+
+        .cancel-btn {
+            background: #f0f3ff;
+            color: #2c3e50;
+        }
+
+        .cancel-btn:hover {
+            background: #e0e6ff;
+        }
+
+        .confirm-delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .confirm-delete-btn:hover {
+            background: #c0392b;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .schedule-section {
+                border-right: none;
+                border-bottom: 1px solid #e8eef5;
+                padding: 16px;
+            }
+
+            .schedule-img {
+                max-width: 200px;
+            }
+
+            .menu {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .header-left h1 {
+                font-size: 18px;
+            }
+
+            .header-right {
+                width: 100%;
+            }
+
+            .logout-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .dashboard-section {
+                padding: 16px;
+            }
+
+            .dashboard-header h2 {
+                font-size: 22px;
+            }
+
+            .card-dates {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <h1>ClassNotify Pro</h1>
+            <schedule-section>by PunYaOn coding team</schedule-section>
+        </div>
+        <div class="header-right">
+            <button class="logout-btn" onclick="window.location.href='/logout'">ออกจากระบบ</button>
+        </div>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="layout">
+
+        <!-- LEFT SECTION - SCHEDULE -->
+        <div class="schedule-section">
+            <div class="schedule-label">ตารางเรียนห้องเรียน 4/15</div>
+            <img src="/static/schedule.jpg" alt="ตารางเรียน" class="schedule-img">
+        </div>
+
+        <!-- RIGHT SECTION - DASHBOARD -->
+        <div class="dashboard-section">
+
+            <div class="dashboard-header">
+                <h2>การบ้านและงานค้าง</h2>
+                <p>ระบบประกาศการบ้านและงานค้างรายวัน</p>
+            </div>
+
+            <!-- MENU SECTION -->
+            <div class="menu-section">
+                <h3>เมนู</h3>
+                <div class="menu">
+                    <a href="/add">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        เพิ่มรายการ
+                    </a>
+                    <a href="/history">
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        ดูประวัติ
+                    </a>
+                </div>
+            </div>
+
+            <!-- CARDS SECTION -->
+            <div class="cards-section">
+                <h3>รายการปัจจุบัน</h3>
+
+                {% if announcements %}
+                <div class="cards-container">
+                    {% for row in announcements %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">{{ row.subject_name }}</h4>
+                            <span class="card-badge">{{ row.type }}</span>
+                        </div>
+
+                        <p class="card-content">
+                            <strong>ครูผู้สอน:</strong> {{ row.teacher_name }}<br>
+                            <strong>รายละเอียด:</strong> {{ row.detail }}
+                        </p>
+
+                        <div class="card-dates">
+                            <div class="card-date-item">
+                                <strong>ประกาศ</strong>
+                                {{ row.announce_date }}
+                            </div>
+                            <div class="card-date-item">
+                                <strong>กำหนดส่ง</strong>
+                                {{ row.due_date }}
+                            </div>
+                        </div>
+
+                        <div class="card-actions">
+                            <a href="{{ url_for('edit', id=row.id) }}">
+                                <button type="button" class="card-btn edit-btn">✏ แก้ไข</button>
+                            </a>
+                            <form action="{{ url_for('delete', id=row.id) }}" method="POST"
+                                onsubmit="return confirmDelete(event, this);">
+                                <button type="submit" class="card-btn delete-btn">🗑 ลบ</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <p>✨ ยังไม่มีงานที่ต้องทำ</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- BOTTOM ACTION -->
+            <div class="bottom-action">
+                <a href="/send" style="text-decoration: none;">
+                    <button class="send-btn">
+                        <img src="/static/line-logo.png" alt="LINE" class="send-icon-img">
+                        สร้างสรุปและส่ง LINE
+                    </button>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-box">
+            <h3>⚠ ยืนยันการลบ</h3>
+            <p>แน่ใจหรือไม่ว่าต้องการลบงานนี้? คิดดีๆเด้อ</p>
+
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" onclick="closeModal()">ยกเลิก</button>
+                <button class="modal-btn confirm-delete-btn" onclick="confirmSubmit()">ลบ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let formToSubmit = null;
+
+        function confirmDelete(event, form) {
+            event.preventDefault();
+            formToSubmit = form;
+            document.getElementById("deleteModal").style.display = "flex";
+            return false;
+        }
+
+        function closeModal() {
+            document.getElementById("deleteModal").style.display = "none";
+        }
+
+        function confirmSubmit() {
+            if (formToSubmit) {
+                formToSubmit.submit();
+            }
+        }
+
+        // ปิด modal เมื่อคลิกนอก modal
+        document.getElementById("deleteModal").addEventListener("click", function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+
+</body>
+
+</html>
