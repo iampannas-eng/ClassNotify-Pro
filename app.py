@@ -90,14 +90,18 @@ def add():
         type_value = request.form["type"]
         subject_id = request.form["subject_id"]
         detail = request.form["detail"]
-        announce_date = datetime.now().strftime("%Y-%m-%d")
+        
+        # ✅ Thailand Timezone
+        thailand_tz = timezone(timedelta(hours=7))
+        now_thailand = datetime.now(thailand_tz)
+        announce_date = now_thailand.strftime("%Y-%m-%d")
         due_date = request.form["due_date"]
 
         cur.execute("""
             INSERT INTO announcements
             (type, subject_id, detail, announce_date, due_date, created_at)
             VALUES (%s, %s, %s, %s, %s, %s)
-        """, (type_value, subject_id, detail, announce_date, due_date, datetime.now()))
+        """, (type_value, subject_id, detail, announce_date, due_date, now_thailand))
 
         conn.commit()
         cur.close()
@@ -258,9 +262,15 @@ def edit(id):
 
     return render_template("edit.html", announcement=announcement, subjects=subjects)
 
+from datetime import datetime, timedelta, timezone
+
 def format_line_message(rows):
-    thai_date = datetime.now().strftime("%d/%m/%Y")
-    thai_time = datetime.now().strftime("%H:%M")
+    # ✅ เพิ่ม timezone Thailand
+    thailand_tz = timezone(timedelta(hours=7))
+    now_thailand = datetime.now(thailand_tz)
+    
+    thai_date = now_thailand.strftime("%d/%m/%Y")
+    thai_time = now_thailand.strftime("%H:%M")
 
     message = "📋 การบ้านและงานค้าง\n"
     message += f"วันที่ {thai_date}\n\n"
