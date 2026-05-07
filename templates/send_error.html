@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ส่งไม่สำเร็จ</title>
+    <style>
+        body { text-align: center; padding: 50px; font-family: Arial; }
+        .error { color: red; font-size: 20px; }
+        a { margin-top: 20px; display: inline-block; padding: 10px 20px; background: blue; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1 class="error">❌ ส่งไม่สำเร็จ</h1>
+    <p>{{ error }}</p>
+    <a href="{{ url_for('home') }}">← กลับ Dashboard</a>
+</body>
+</html>

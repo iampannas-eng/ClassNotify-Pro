@@ -151,8 +151,13 @@ def send():
     }
 
     response = requests.post(url, headers=headers, json=data)
-    return "ส่ง LINE สำเร็จ!" if response.status_code == 200 else f"Error: {response.text}"
-
+    
+    if response.status_code == 200:
+        return render_template("send_success.html")
+    else:
+        return render_template("send_error.html", error=response.text)
+    
+    
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
