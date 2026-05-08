@@ -11,7 +11,7 @@ load_dotenv()
 # ✅ ดึงค่าจาก Environment Variables (Render จะตั้งให้)
 DATABASE_URL = os.getenv("DATABASE_URL")
 LINE_ACCESS_TOKEN = os.getenv("LINE_ACCESS_TOKEN")
-LINE_USER_ID = os.getenv("LINE_GROUP_ID")
+LINE_USER_ID = os.getenv("LINE_USER_ID")
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
