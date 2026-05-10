@@ -5,6 +5,9 @@ from datetime import datetime
 import requests
 import os
 from dotenv import load_dotenv
+from calendar import monthcalendar, month_name
+from dateutil import rrule
+from datetime import datetime, timedelta, timezone
 
 load_dotenv()
 
@@ -77,6 +80,8 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
+
 
 @app.route("/add", methods=["GET", "POST"])
 def add():
@@ -291,6 +296,63 @@ def format_line_message(rows):
     message += f"ส่งเวลา {thai_time} น."
 
     return message
+
+
+@app.route("/shared-calendar")
+def shared_calendar():
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    # ✅ Thailand Timezone
+    thailand_tz = timezone(timedelta(hours=7))
+    now_thailand = datetime.now(thailand_tz)
+    
+    year = request.args.get("year", now_thailand.year, type=int)
+    month = request.args.get("month", now_thailand.month, type=int)
+
+    # ดึงข้อมูลทั้งเดือน
+    cur.execute("""
+        SELECT announcements.*, 
+               subjects.subject_name, 
+               subjects.teacher_name
+        FROM announcements
+        JOIN subjects ON announcements.subject_id = subjects.id
+        WHERE EXTRACT(YEAR FROM announce_date) = %s
+        AND EXTRACT(MONTH FROM announce_date) = %s
+        ORDER BY announce_date ASC
+    """, (year, month))
+    
+    announcements = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    # จัดเรียงข้อมูลตามวัน
+    announcements_by_date = {}
+    for ann in announcements:
+        date_str = str(ann['announce_date'])
+        if date_str not in announcements_by_date:
+            announcements_by_date[date_str] = []
+        announcements_by_date[date_str].append(ann)
+
+    # สร้าง Calendar
+    cal = monthcalendar(year, month)
+    
+    # ข้อมูลเดือนก่อน/หลัง
+    prev_month = month - 1 if month > 1 else 12
+    prev_year = year if month > 1 else year - 1
+    next_month = month + 1 if month < 12 else 1
+    next_year = year if month < 12 else year + 1
+
+    return render_template("shared_calendar.html", 
+                         year=year, 
+                         month=month,
+                         month_name=month_name[month],
+                         cal=cal,
+                         announcements_by_date=announcements_by_date,
+                         prev_year=prev_year,
+                         prev_month=prev_month,
+                         next_year=next_year,
+                         next_month=next_month)
 
 if __name__ == "__main__":
     app.run(debug=True)
