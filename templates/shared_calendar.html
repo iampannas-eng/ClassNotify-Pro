@@ -86,7 +86,7 @@
         .calendar-table {
             width: 100%;
             border-collapse: collapse;
-            padding: 24px;
+            table-layout: fixed;
         }
 
         .weekday {
@@ -96,15 +96,18 @@
             text-align: center;
             border-bottom: 2px solid #e8eef5;
             color: #5B6FFF;
+            width: 14.28%;
         }
 
         .day-cell {
             border: 1px solid #e8eef5;
             padding: 12px;
-            height: 120px;
+            height: 140px;
             vertical-align: top;
             background: white;
             transition: all 0.2s ease;
+            width: 14.28%;
+            overflow: hidden;
         }
 
         .day-cell:hover {
