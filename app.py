@@ -292,7 +292,9 @@ def format_line_message(rows):
 
     message += "จาก นาย ปัณณ์ สุขส่ง\n"
     message += "(หัวหน้าฝ่ายวิชาการ)\n"
-    message += f"ส่งเวลา {thai_time} น."
+    message += f"ส่งเวลา {thai_time} น.\n"
+    message += "   \n"
+    message += "ทดสอบระบบครั้งที่ 1 (เวอร์ชั่น 6.7)\n"
 
     return message
 
