@@ -202,20 +202,164 @@
         }
 
         @media (max-width: 768px) {
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .container {
+                padding: 0 8px;
+                margin: 16px auto;
+            }
+
             .calendar-header {
                 flex-direction: column;
                 gap: 12px;
+                padding: 16px;
+            }
+
+            .calendar-header h2 {
+                font-size: 20px;
+            }
+
+            .calendar-nav {
+                width: 100%;
+            }
+
+            .nav-btn {
+                flex: 1;
+                padding: 10px 8px;
+                font-size: 13px;
             }
 
             .day-cell {
                 height: 100px;
                 padding: 8px;
-                font-size: 13px;
+                font-size: 12px;
+            }
+
+            .day-number {
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
+
+            .day-announcements {
+                max-height: 60px;
+                font-size: 11px;
             }
 
             .day-announcement {
+                font-size: 10px;
+                padding: 2px 4px;
+                margin-bottom: 2px;
+            }
+
+            .modal-box {
+                width: 95%;
+                max-width: 95%;
+                padding: 16px;
+            }
+
+            .modal-box h3 {
+                font-size: 16px;
+            }
+
+            .modal-box .card {
+                padding: 10px;
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+
+            .close-btn {
+                width: 100%;
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 12px 16px;
+            }
+
+            .header h1 {
+                font-size: 16px;
+            }
+
+            .container {
+                padding: 0 4px;
+                margin: 12px auto;
+            }
+
+            .calendar-header {
+                padding: 12px;
+            }
+
+            .calendar-header h2 {
+                font-size: 18px;
+            }
+
+            .calendar-nav {
+                flex-wrap: wrap;
+            }
+
+            .nav-btn {
+                padding: 8px 6px;
+                font-size: 12px;
+                flex: 0 1 calc(33.33% - 4px);
+            }
+
+            .day-cell {
+                height: 90px;
+                padding: 6px;
                 font-size: 11px;
-                padding: 3px 5px;
+            }
+
+            .day-number {
+                font-size: 13px;
+                font-weight: 700;
+                margin-bottom: 2px;
+            }
+
+            .day-announcements {
+                max-height: 55px;
+                font-size: 10px;
+            }
+
+            .day-announcement {
+                font-size: 9px;
+                padding: 2px 3px;
+                margin-bottom: 1px;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: clip;
+            }
+
+            .weekday {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+
+            .modal-box {
+                width: 98%;
+                padding: 12px;
+            }
+
+            .modal-box h3 {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+
+            .modal-box .card {
+                padding: 8px;
+                font-size: 11px;
+                margin-bottom: 6px;
+                border-left-width: 3px;
+            }
+
+            .close-btn {
+                padding: 10px;
+                font-size: 12px;
+                margin-top: 12px;
             }
         }
     </style>
