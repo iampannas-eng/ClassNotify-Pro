@@ -1,13 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import requests
 import os
 from dotenv import load_dotenv
 from calendar import monthcalendar, month_name
-from dateutil import rrule
-from datetime import datetime, timedelta, timezone
+
+# ... code ต่อไป (ไม่ต้องซ้ำ import)
 
 load_dotenv()
 
@@ -267,7 +267,6 @@ def edit(id):
 
     return render_template("edit.html", announcement=announcement, subjects=subjects)
 
-from datetime import datetime, timedelta, timezone
 
 def format_line_message(rows):
     # ✅ เพิ่ม timezone Thailand
