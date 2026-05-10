@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - ClassNotify Pro</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 
     <style>
@@ -421,6 +422,7 @@
                 transform: translateY(-20px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -568,11 +570,21 @@
                 <h3>เมนู</h3>
                 <div class="menu">
                     <a href="/add">
-                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
                         เพิ่มรายการ
                     </a>
                     <a href="/history">
-                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
                         ดูประวัติ
                     </a>
                 </div>
@@ -628,12 +640,10 @@
 
             <!-- BOTTOM ACTION -->
             <div class="bottom-action">
-                <a href="/send" style="text-decoration: none;">
-                    <button class="send-btn">
-                        <img src="/static/line-logo.png" alt="LINE" class="send-icon-img">
-                        สร้างสรุปและส่ง LINE
-                    </button>
-                </a>
+                <button class="send-btn" onclick="showSendModal()">
+                    <img src="/static/line-logo.png" alt="LINE" class="send-icon-img">
+                    สร้างสรุปและส่ง LINE
+                </button>
             </div>
 
         </div>
@@ -649,6 +659,20 @@
             <div class="modal-actions">
                 <button class="modal-btn cancel-btn" onclick="closeModal()">ยกเลิก</button>
                 <button class="modal-btn confirm-delete-btn" onclick="confirmSubmit()">ลบ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEND LINE MODAL -->
+    <div id="sendModal" class="modal">
+        <div class="modal-box">
+            <h3>📨 ยืนยันการส่ง LINE</h3>
+            <p>ส่งสรุปการบ้านและงานค้างลงกลุ่มหรือไม่?</p>
+
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" onclick="closeSendModal()">ยกเลิก</button>
+                <button class="modal-btn confirm-delete-btn" onclick="submitSend()"
+                    style="background: #00b900; color: white;">ส่ง</button>
             </div>
         </div>
     </div>
@@ -674,9 +698,30 @@
         }
 
         // ปิด modal เมื่อคลิกนอก modal
-        document.getElementById("deleteModal").addEventListener("click", function(event) {
+        document.getElementById("deleteModal").addEventListener("click", function (event) {
             if (event.target === this) {
                 closeModal();
+            }
+        });
+
+        // Send LINE Modal
+        function showSendModal() {
+            document.getElementById("sendModal").style.display = "flex";
+        }
+
+        function closeSendModal() {
+            document.getElementById("sendModal").style.display = "none";
+        }
+
+        function submitSend() {
+            closeSendModal();
+            window.location.href = "/send";
+        }
+
+        // ปิด modal เมื่อคลิกนอก modal
+        document.getElementById("sendModal").addEventListener("click", function (event) {
+            if (event.target === this) {
+                closeSendModal();
             }
         });
     </script>
