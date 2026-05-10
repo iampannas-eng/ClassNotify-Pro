@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ปฏิทิน - ClassNotify Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+            color: #2c3e50;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e8eef5;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+
+        .calendar-wrapper {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            background: #5B6FFF;
+            color: white;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calendar-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .calendar-table {
+            width: 100%;
+            border-collapse: collapse;
+            padding: 24px;
+        }
+
+        .weekday {
+            background: #f5f7fa;
+            padding: 12px;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: 2px solid #e8eef5;
+            color: #5B6FFF;
+        }
+
+        .day-cell {
+            border: 1px solid #e8eef5;
+            padding: 12px;
+            height: 120px;
+            vertical-align: top;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .day-cell:hover {
+            background: #f5f7fa;
+        }
+
+        .day-cell.other-month {
+            background: #f9f9f9;
+            color: #bdc3c7;
+        }
+
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .day-cell.other-month .day-number {
+            color: #bdc3c7;
+        }
+
+        .day-announcements {
+            font-size: 12px;
+            overflow-y: auto;
+            max-height: 90px;
+        }
+
+        .day-announcement {
+            background: #f0f3ff;
+            color: #5B6FFF;
+            padding: 4px 6px;
+            border-radius: 3px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .day-announcement:hover {
+            background: #5B6FFF;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-box h3 {
+            margin: 0 0 16px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .modal-box .card {
+            background: #f5f7fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border-left: 4px solid #5B6FFF;
+        }
+
+        .close-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .close-btn:hover {
+            background: #f5f7fa;
+        }
+
+        @media (max-width: 768px) {
+            .calendar-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .day-cell {
+                height: 100px;
+                padding: 8px;
+                font-size: 13px;
+            }
+
+            .day-announcement {
+                font-size: 11px;
+                padding: 3px 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>ClassNotify Pro - ปฏิทินการบ้าน</h1>
+    </div>
+
+    <div class="container">
+        <div class="calendar-wrapper">
+            <div class="calendar-header">
+                <h2>{{ month_name }} {{ year }}</h2>
+                <div class="calendar-nav">
+                    <a href="/shared-calendar?year={{ prev_year }}&month={{ prev_month }}">
+                        <button class="nav-btn">← เดือนก่อน</button>
+                    </a>
+                    <a href="/shared-calendar">
+                        <button class="nav-btn">วันนี้</button>
+                    </a>
+                    <a href="/shared-calendar?year={{ next_year }}&month={{ next_month }}">
+                        <button class="nav-btn">เดือนต่อไป →</button>
+                    </a>
+                </div>
+            </div>
+
+            <table class="calendar-table">
+                <thead>
+                    <tr>
+                        <th class="weekday">จันทร์</th>
+                        <th class="weekday">อังคาร</th>
+                        <th class="weekday">พุธ</th>
+                        <th class="weekday">พฤหัส</th>
+                        <th class="weekday">ศุกร์</th>
+                        <th class="weekday">เสาร์</th>
+                        <th class="weekday">อาทิตย์</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for week in cal %}
+                    <tr>
+                        {% for day in week %}
+                        <td class="day-cell {% if day == 0 %}other-month{% endif %}">
+                            {% if day != 0 %}
+                            <div class="day-number">{{ day }}</div>
+                            <div class="day-announcements">
+                                {% set date_key = "%04d-%02d-%02d"|format(year, month, day) %}
+                                {% if date_key in announcements_by_date %}
+                                    {% for ann in announcements_by_date[date_key] %}
+                                    <div class="day-announcement" onclick="showDetails('{{ date_key }}', this)">
+                                        📌 {{ ann.subject_name }}
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- DETAIL MODAL -->
+    <div id="detailModal" class="modal">
+        <div class="modal-box">
+            <h3 id="modalTitle">รายละเอียด</h3>
+            <div id="modalContent"></div>
+            <button class="close-btn" onclick="closeModal()">ปิด</button>
+        </div>
+    </div>
+
+    <!-- ข้อมูลจาก Flask -->
+    <script type="application/json" id="announcements-data">
+{{ announcements_by_date|tojson }}
+    </script>
+
+    <script>
+        let currentDate = null;
+
+        function showDetails(dateStr, element) {
+            currentDate = dateStr;
+            const date = new Date(dateStr);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = date.toLocaleDateString('th-TH', options);
+
+            document.getElementById('modalTitle').textContent = 'งานในวันที่ ' + formattedDate;
+            document.getElementById('detailModal').style.display = 'flex';
+            loadDetails(dateStr);
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        function loadDetails(dateStr) {
+            // ดึงข้อมูลจาก JSON script tag
+            const announcementsJson = document.getElementById('announcements-data').textContent;
+            const announcements = JSON.parse(announcementsJson);
+            
+            if (announcements[dateStr]) {
+                let html = '';
+                announcements[dateStr].forEach(ann => {
+                    html += `
+                    <div class="card">
+                        <strong>${ann.subject_name}</strong> (${ann.type})<br>
+                        ครู: ${ann.teacher_name}<br>
+                        รายละเอียด: ${ann.detail}<br>
+                        ส่งวันที่: ${ann.due_date}
+                    </div>
+                    `;
+                });
+                document.getElementById('modalContent').innerHTML = html;
+            }
+        }
+
+        document.getElementById('detailModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
