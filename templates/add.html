@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เพิ่มรายการงาน - ClassNotify Pro</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <style>
         /* ===== RESET & GLOBAL ===== */
@@ -298,15 +299,58 @@
             </div>
 
             <div class="form-group">
-                <label for="subject_id">วิชา</label>
-                <select name="subject_id" id="subject_id" required>
+                <label>ค้นหาวิชา:</label>
+                <input type="text" id="searchSubject" placeholder="ค้นหาตามชื่อวิชาหรือครู"
+                    style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                <div id="searchResults"
+                    style="display:none; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; background: white; margin-bottom: 10px;">
+                </div>
+
+                <label>วิชา:</label>
+                <select name="subject_id" id="subjectSelect" required
+                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                     <option value="">-- เลือกวิชา --</option>
                     {% for subject in subjects %}
-                    <option value="{{ subject.id }}">
-                        {{ subject.subject_name }} ({{ subject.teacher_name }})
-                    </option>
+                    <option value="{{ subject.id }}">{{ subject.subject_name }} ({{ subject.teacher_name }})</option>
                     {% endfor %}
                 </select>
+
+                <script>
+                    document.getElementById('searchSubject').addEventListener('keyup', function (e) {
+                        const query = e.target.value;
+
+                        if (query.length < 1) {
+                            document.getElementById('searchResults').style.display = 'none';
+                            return;
+                        }
+
+                        fetch(`/search-subjects?q=${encodeURIComponent(query)}`)
+                            .then(r => r.json())
+                            .then(data => {
+                                const resultsDiv = document.getElementById('searchResults');
+
+                                if (data.subjects.length === 0) {
+                                    resultsDiv.innerHTML = '<p style="padding: 10px;">ไม่พบผลลัพธ์</p>';
+                                } else {
+                                    resultsDiv.innerHTML = data.subjects.map(s => `
+                        <div style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;" 
+                             onclick="selectSubject(${s.id}, '${s.subject_name}', '${s.teacher_name}')">
+                            <strong>${s.subject_name}</strong><br>
+                            ครู: ${s.teacher_name}
+                        </div>
+                    `).join('');
+                                }
+
+                                resultsDiv.style.display = 'block';
+                            });
+                    });
+
+                    function selectSubject(id, name, teacher) {
+                        document.getElementById('searchSubject').value = name + ' (' + teacher + ')';
+                        document.getElementById('subjectSelect').value = id;
+                        document.getElementById('searchResults').style.display = 'none';
+                    }
+                </script>
             </div>
 
             <div class="form-group">

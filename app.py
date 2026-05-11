@@ -267,6 +267,29 @@ def edit(id):
 
     return render_template("edit.html", announcement=announcement, subjects=subjects)
 
+@app.route("/search-subjects")
+def search_subjects():
+    query = request.args.get("q", "").strip()
+    
+    if not query:
+        return {"subjects": []}
+    
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    
+    cur.execute("""
+        SELECT * FROM subjects 
+        WHERE subject_name ILIKE %s 
+        OR teacher_name ILIKE %s
+        ORDER BY id ASC
+    """, (f"%{query}%", f"%{query}%"))
+    
+    subjects = cur.fetchall()
+    cur.close()
+    conn.close()
+    
+    return {"subjects": subjects}
+
 
 def format_line_message(rows):
     # ✅ เพิ่ม timezone Thailand
