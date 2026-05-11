@@ -294,7 +294,7 @@ def format_line_message(rows):
     message += "(หัวหน้าฝ่ายวิชาการ)\n"
     message += f"ส่งเวลา {thai_time} น.\n"
     message += "   \n"
-    message += "ทดสอบระบบครั้งที่ 1 (เวอร์ชั่น 6.7)\n"
+    message += "นี่คือการทดสอบระบบครั้งที่ 1 (เวอร์ชั่น 6.7)"
 
     return message
 
