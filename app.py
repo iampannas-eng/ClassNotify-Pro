@@ -113,7 +113,7 @@ def add():
         conn.close()
         return redirect(url_for("home"))
 
-    cur.execute("SELECT * FROM subjects")
+    cur.execute("SELECT * FROM subjects ORDER BY id ASC")
     subjects = cur.fetchall()
     cur.close()
     conn.close()
