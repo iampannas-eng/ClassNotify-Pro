@@ -317,7 +317,6 @@ def format_line_message(rows):
     message += "(หัวหน้าฝ่ายวิชาการ)\n"
     message += f"ส่งเวลา {thai_time} น.\n"
     message += "   \n"
-    message += "เวอร์ชั่นระบบ v.1.18.05.2569"
 
     return message
 
