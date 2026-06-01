@@ -145,26 +145,19 @@ def send():
 
     message_text = format_line_message(rows)
 
-    url = "https://api.line.me/v2/bot/message/push"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
-    }
+    # ✅ ส่งไป Dell แทน LINE API
+    dell_url = "http://192.168.1.69:5001/receive-message"
+    data_to_dell = {"message": message_text}
 
-    if len(message_text) > 4900:
-        message_text = message_text[:4900] + "\n\n(ข้อความถูกตัดบางส่วน)"
-
-    data = {
-        "to": LINE_USER_ID,
-        "messages": [{"type": "text", "text": message_text}]
-    }
-
-    response = requests.post(url, headers=headers, json=data)
+    try:
+        response = requests.post(dell_url, json=data_to_dell, timeout=10)
+        if response.status_code == 200:
+            return render_template("send_success.html")
+        else:
+            return render_template("send_error.html", error="Dell ไม่ตอบสนอง")
+    except Exception as e:
+        return render_template("send_error.html", error=str(e))
     
-    if response.status_code == 200:
-        return render_template("send_success.html")
-    else:
-        return render_template("send_error.html", error=response.text)
     
     
 @app.route("/webhook", methods=["POST"])
