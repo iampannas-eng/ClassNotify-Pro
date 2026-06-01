@@ -146,7 +146,7 @@ def send():
     message_text = format_line_message(rows)
 
     # ✅ ส่งไป Dell แทน LINE API
-    dell_url = "http://192.168.1.69:5001/receive-message"
+    dell_url = "https://merlin-unnameable-sublimely.ngrok-free.dev/receive-message"
     data_to_dell = {"message": message_text}
 
     try:
