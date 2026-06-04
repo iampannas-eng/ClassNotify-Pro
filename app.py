@@ -145,19 +145,26 @@ def send():
 
     message_text = format_line_message(rows)
 
-    # ✅ ส่งไป Dell แทน LINE API
-    dell_url = "https://merlin-unnameable-sublimely.ngrok-free.dev/receive-message"
-    data_to_dell = {"message": message_text}
+    url = "https://api.line.me/v2/bot/message/push"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
+    }
 
-    try:
-        response = requests.post(dell_url, json=data_to_dell, timeout=10)
-        if response.status_code == 200:
-            return render_template("send_success.html")
-        else:
-            return render_template("send_error.html", error="Dell ไม่ตอบสนอง")
-    except Exception as e:
-        return render_template("send_error.html", error=str(e))
+    if len(message_text) > 4900:
+        message_text = message_text[:4900] + "\n\n(ข้อความถูกตัดบางส่วน)"
+
+    data = {
+        "to": LINE_USER_ID,
+        "messages": [{"type": "text", "text": message_text}]
+    }
+
+    response = requests.post(url, headers=headers, json=data)
     
+    if response.status_code == 200:
+        return render_template("send_success.html")
+    else:
+        return render_template("send_error.html", error=response.text)
     
     
 @app.route("/webhook", methods=["POST"])
