@@ -1,0 +1,6 @@
+# บังคับให้สคริปต์ที่จะไปรันบน Linux ใช้ LF เสมอ แม้แก้บน Windows
+*.sh   text eol=lf
+*.sql  text eol=lf
+*.py   text eol=lf
+*.yml  text eol=lf
+Dockerfile text eol=lf

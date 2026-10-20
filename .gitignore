@@ -27,3 +27,6 @@ ENV/
 
 # MacOS
 .DS_Store
+# Backups (สร้างโดย scripts/backup.sh)
+backups/
+*.sql.gz

@@ -1,15 +1,26 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from datetime import datetime
 import requests
 import os
 from dotenv import load_dotenv
 from calendar import monthcalendar, month_name
 from datetime import datetime, timedelta, timezone
+from werkzeug.security import check_password_hash
 
 
 load_dotenv()
+
+# ✅ เวลาไทย (UTC+7) ใช้ที่เดียวทั้งแอป ไม่ขึ้นกับ timezone ของเซิร์ฟเวอร์
+THAI_TZ = timezone(timedelta(hours=7))
+
+
+def thai_now():
+    return datetime.now(THAI_TZ)
+
+
+def thai_today():
+    return thai_now().strftime("%Y-%m-%d")
 
 # ✅ ดึงค่าจาก Environment Variables (Render จะตั้งให้)
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -37,7 +48,7 @@ def home():
 
     conn = get_db()
     cur = conn.cursor(cursor_factory=RealDictCursor)
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = thai_today()
 
     cur.execute("""
         SELECT announcements.*, 
@@ -68,7 +79,7 @@ def login():
         cur.close()
         conn.close()
 
-        if user and user["password"] == password:
+        if user and check_password_hash(user["password"], password):
             session["user_id"] = user["id"]
             return redirect(url_for("home"))
         else:
@@ -96,9 +107,7 @@ def add():
         subject_id = request.form["subject_id"]
         detail = request.form["detail"]
         
-        # ✅ Thailand Timezone
-        thailand_tz = timezone(timedelta(hours=7))
-        now_thailand = datetime.now(thailand_tz)
+        now_thailand = thai_now()
         announce_date = now_thailand.strftime("%Y-%m-%d")
         due_date = request.form["due_date"]
 
@@ -127,7 +136,7 @@ def send():
 
     conn = get_db()
     cur = conn.cursor(cursor_factory=RealDictCursor)
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = thai_today()
 
     cur.execute("""
         SELECT announcements.*, 
@@ -167,6 +176,20 @@ def send():
         return render_template("send_error.html", error=response.text)
     
     
+@app.route("/health")
+def health():
+    """ใช้โดย Docker healthcheck / Cloudflare ตรวจว่าแอปและฐานข้อมูลยังทำงาน"""
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT 1")
+        cur.close()
+        conn.close()
+        return {"status": "ok"}, 200
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}, 500
+
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
@@ -292,9 +315,7 @@ def search_subjects():
 
 
 def format_line_message(rows):
-    # ✅ เพิ่ม timezone Thailand
-    thailand_tz = timezone(timedelta(hours=7))
-    now_thailand = datetime.now(thailand_tz)
+    now_thailand = thai_now()
     
     thai_date = now_thailand.strftime("%d/%m/%Y")
     thai_time = now_thailand.strftime("%H:%M")
@@ -326,9 +347,7 @@ def shared_calendar():
     conn = get_db()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    # ✅ Thailand Timezone
-    thailand_tz = timezone(timedelta(hours=7))
-    now_thailand = datetime.now(thailand_tz)
+    now_thailand = thai_now()
     
     year = request.args.get("year", now_thailand.year, type=int)
     month = request.args.get("month", now_thailand.month, type=int)
@@ -378,4 +397,4 @@ def shared_calendar():
                          next_month=next_month)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=8000, debug=True)
