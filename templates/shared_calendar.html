@@ -64,11 +64,11 @@
         <h2>{{ month_name }} {{ year + 543 }}</h2>
     </div>
     <div class="cal-nav">
-        <a class="btn btn-secondary" href="/shared-calendar?year={{ prev_year }}&month={{ prev_month }}" aria-label="เดือนก่อน">
+        <a class="btn btn-secondary" href="{{ request.path }}?year={{ prev_year }}&month={{ prev_month }}" aria-label="เดือนก่อน">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
         </a>
-        <a class="btn btn-secondary today-btn" href="/shared-calendar">วันนี้</a>
-        <a class="btn btn-secondary" href="/shared-calendar?year={{ next_year }}&month={{ next_month }}" aria-label="เดือนถัดไป">
+        <a class="btn btn-secondary today-btn" href="{{ request.path }}">วันนี้</a>
+        <a class="btn btn-secondary" href="{{ request.path }}?year={{ next_year }}&month={{ next_month }}" aria-label="เดือนถัดไป">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
         </a>
     </div>

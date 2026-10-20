@@ -91,6 +91,12 @@ def get_db():
     return conn
 
 @app.route("/")
+def index():
+    """หน้าแรกสาธารณะ = ปฏิทินการบ้าน (ไม่ต้องล็อกอิน)"""
+    return shared_calendar()
+
+
+@app.route("/dashboard")
 def home():
     if "user_id" not in session:
         return redirect(url_for("login"))
@@ -117,6 +123,8 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "GET" and "user_id" in session:
+        return redirect(url_for("home"))
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -139,7 +147,7 @@ def login():
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("login"))
+    return redirect(url_for("index"))
 
 
 

@@ -100,6 +100,8 @@
         .logout svg { width: 16px; height: 16px; }
         .logout:hover { background: rgba(255,255,255,0.12); opacity: 1; }
         .nav-desktop + .logout { margin-left: 8px; }
+        .hdr-cta { background: var(--pencil); color: var(--green-dark); border-color: transparent; font-weight: 600; opacity: 1; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.12); }
+        .hdr-cta:hover { background: #f6d464; }
 
         /* ===== เมนูล่าง (มือถือ) ===== */
         .nav-mobile {
@@ -246,10 +248,10 @@
 <body class="{% if not public %}has-nav{% endif %}">
 {% set ep = request.endpoint %}
 {% set nav_items = [
-    ('home', '/', 'หน้าหลัก', 'home'),
+    ('home', '/dashboard', 'หน้าหลัก', 'home'),
     ('add', '/add', 'เพิ่มงาน', 'plus'),
     ('history', '/history', 'ประวัติ', 'clock'),
-    ('shared_calendar', '/shared-calendar', 'ปฏิทิน', 'calendar')
+    ('shared_calendar', '/', 'ปฏิทิน', 'calendar')
 ] %}
 {% macro icon(name) -%}
     {%- if name == 'home' -%}
@@ -260,6 +262,8 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
     {%- elif name == 'calendar' -%}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+    {%- elif name == 'login' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l5 5-5 5"/><path d="M19 12H9"/><path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/></svg>
     {%- elif name == 'logout' -%}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M13 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5"/></svg>
     {%- elif name == 'bell' -%}
@@ -269,7 +273,7 @@
 
 <header class="topbar">
     <div class="wrap topbar-in">
-        <a class="brand" href="{{ '/shared-calendar' if public else '/' }}">
+        <a class="brand" href="{{ '/' if public else '/dashboard' }}">
             <span class="brand-icon">{{ icon('bell') }}</span>
             <span class="brand-text">
                 <div class="brand-name">ClassNotify Pro</div>
@@ -279,10 +283,16 @@
         {% if not public %}
         <nav class="nav-desktop">
             {% for key, href, label, ic in nav_items %}
-            <a href="{{ href }}" class="{% if ep == key or (key == 'history' and ep == 'history_detail') or (key == 'add' and ep == 'edit') %}active{% endif %}">{{ icon(ic) }}{{ label }}</a>
+            <a href="{{ href }}" class="{% if ep == key or (key == 'history' and ep == 'history_detail') or (key == 'add' and ep == 'edit') or (key == 'shared_calendar' and ep == 'index') %}active{% endif %}">{{ icon(ic) }}{{ label }}</a>
             {% endfor %}
         </nav>
         <a class="logout" href="/logout">{{ icon('logout') }}<span>ออกจากระบบ</span></a>
+        {% elif ep != 'login' %}
+            {% if session.get('user_id') %}
+            <a class="logout hdr-cta" href="/dashboard">{{ icon('home') }}<span>หลังบ้าน</span></a>
+            {% else %}
+            <a class="logout hdr-cta" href="/login">{{ icon('login') }}<span>เข้าสู่ระบบ</span></a>
+            {% endif %}
         {% endif %}
     </div>
 </header>
@@ -294,7 +304,7 @@
 {% if not public %}
 <nav class="nav-mobile">
     {% for key, href, label, ic in nav_items %}
-    <a href="{{ href }}" class="{% if ep == key or (key == 'history' and ep == 'history_detail') or (key == 'add' and ep == 'edit') %}active{% endif %}">{{ icon(ic) }}<span>{{ label }}</span></a>
+    <a href="{{ href }}" class="{% if ep == key or (key == 'history' and ep == 'history_detail') or (key == 'add' and ep == 'edit') or (key == 'shared_calendar' and ep == 'index') %}active{% endif %}">{{ icon(ic) }}<span>{{ label }}</span></a>
     {% endfor %}
 </nav>
 {% endif %}
