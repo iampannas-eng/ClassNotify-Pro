@@ -4,8 +4,8 @@ from psycopg2.extras import RealDictCursor
 import requests
 import os
 from dotenv import load_dotenv
-from calendar import monthcalendar, month_name
-from datetime import datetime, timedelta, timezone
+from calendar import monthcalendar
+from datetime import datetime, timedelta, timezone, date
 from werkzeug.security import check_password_hash
 
 
@@ -22,6 +22,21 @@ def thai_now():
 def thai_today():
     return thai_now().strftime("%Y-%m-%d")
 
+
+THAI_MONTHS_FULL = ["", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+                    "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"]
+THAI_MONTHS_SHORT = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+                     "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."]
+THAI_DAYS = ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"]
+
+
+def _to_date(value):
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    return date.fromisoformat(str(value)[:10])
+
 # ✅ ดึงค่าจาก Environment Variables (Render จะตั้งให้)
 DATABASE_URL = os.getenv("DATABASE_URL")
 LINE_ACCESS_TOKEN = os.getenv("LINE_ACCESS_TOKEN")
@@ -29,6 +44,40 @@ LINE_USER_ID = os.getenv("LINE_USER_ID")
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
+
+
+@app.template_filter("thaidate")
+def thaidate_filter(value, short=True):
+    """2026-10-20 -> 20 ต.ค. 2569 (short) หรือ 20 ตุลาคม 2569"""
+    try:
+        d = _to_date(value)
+    except Exception:
+        return value
+    months = THAI_MONTHS_SHORT if short else THAI_MONTHS_FULL
+    return f"{d.day} {months[d.month]} {d.year + 543}"
+
+
+@app.template_filter("thaiday")
+def thaiday_filter(value):
+    try:
+        return THAI_DAYS[_to_date(value).weekday()]
+    except Exception:
+        return ""
+
+
+@app.template_filter("daysleft")
+def daysleft_filter(value, today=None):
+    """จำนวนวันที่เหลือจนถึงกำหนดส่ง (ติดลบ = เลยกำหนด)"""
+    try:
+        base = _to_date(today) if today else thai_now().date()
+        return (_to_date(value) - base).days
+    except Exception:
+        return None
+
+
+@app.context_processor
+def inject_globals():
+    return {"today": thai_now().date(), "room_name": "ห้อง 4/15"}
 
 @app.after_request
 def add_no_cache_headers(response):
@@ -83,7 +132,7 @@ def login():
             session["user_id"] = user["id"]
             return redirect(url_for("home"))
         else:
-            return "Login Failed"
+            return render_template("login.html", error="ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"), 401
 
     return render_template("login.html")
 
@@ -388,7 +437,7 @@ def shared_calendar():
     return render_template("shared_calendar.html", 
                          year=year, 
                          month=month,
-                         month_name=month_name[month],
+                         month_name=THAI_MONTHS_FULL[month],
                          cal=cal,
                          announcements_by_date=announcements_by_date,
                          prev_year=prev_year,

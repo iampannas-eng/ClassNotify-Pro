@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#2f6b4f">
+    <title>{% block title %}ClassNotify Pro{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== ธีมห้องเรียน: กระดานเขียว + กระดาษครีม ===== */
+        :root {
+            --bg: #f3efe4;
+            --paper: #fffdf8;
+            --ink: #1f2a25;
+            --muted: #6e7a74;
+            --line: #e6dfd0;
+            --green: #2f6b4f;
+            --green-dark: #22503a;
+            --green-soft: #e4efe8;
+            --chalk: #fbf7ec;
+            --pencil: #f2c94c;
+            --pencil-soft: #fff4cf;
+            --red: #c44536;
+            --red-soft: #fbe5e2;
+            --blue: #2f6fb2;
+            --blue-soft: #e3edf9;
+            --purple: #7a4ea3;
+            --purple-soft: #eee6f6;
+            --orange: #d9772b;
+            --orange-soft: #fdebdc;
+            --line-brand: #06c755;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 2px 10px rgba(31, 42, 37, 0.06);
+            --shadow-lg: 0 10px 30px rgba(31, 42, 37, 0.14);
+            --wrap: 1120px;
+            --gutter: 16px;
+            --bottom-nav: 0px;
+        }
+
+        * { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            margin: 0;
+            font-family: 'IBM Plex Sans Thai', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.55;
+            min-height: 100vh;
+            padding-bottom: var(--bottom-nav);
+        }
+        a { color: var(--green); text-decoration: none; }
+        img { max-width: 100%; display: block; }
+        button, input, select, textarea { font: inherit; color: inherit; }
+        h1, h2, h3, h4 { margin: 0; line-height: 1.3; }
+
+        .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gutter); }
+
+        /* ===== กระดาน (header) ===== */
+        .topbar {
+            background:
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 7px),
+                linear-gradient(135deg, var(--green-dark), var(--green));
+            color: var(--chalk);
+            border-bottom: 5px solid #b98852;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.18);
+            position: sticky; top: 0; z-index: 50;
+        }
+        .topbar-in {
+            display: flex; align-items: center; gap: 14px;
+            min-height: 60px; padding-top: 8px; padding-bottom: 8px;
+        }
+        .brand { display: flex; align-items: center; gap: 10px; color: var(--chalk); min-width: 0; }
+        .brand-icon {
+            width: 36px; height: 36px; border-radius: 10px; flex: none;
+            background: var(--pencil); color: var(--green-dark);
+            display: grid; place-items: center;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.15);
+        }
+        .brand-text { line-height: 1.15; min-width: 0; }
+        .brand-name { font-weight: 700; font-size: 18px; letter-spacing: 0.2px; white-space: nowrap; }
+        .brand-sub { font-size: 12px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .nav-desktop { display: none; margin-left: auto; gap: 4px; }
+        .nav-desktop a {
+            color: var(--chalk); padding: 8px 14px; border-radius: 999px;
+            font-weight: 500; font-size: 15px; opacity: 0.85;
+            display: inline-flex; align-items: center; gap: 7px;
+        }
+        .nav-desktop a:hover { background: rgba(255,255,255,0.12); opacity: 1; }
+        .nav-desktop a.active { background: rgba(255,255,255,0.18); opacity: 1; }
+        .nav-desktop svg { width: 17px; height: 17px; }
+
+        .logout {
+            margin-left: auto; color: var(--chalk); font-size: 14px; opacity: 0.85;
+            padding: 7px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.35);
+            display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex: none;
+        }
+        .logout svg { width: 16px; height: 16px; }
+        .logout:hover { background: rgba(255,255,255,0.12); opacity: 1; }
+        .nav-desktop + .logout { margin-left: 8px; }
+
+        /* ===== เมนูล่าง (มือถือ) ===== */
+        .nav-mobile {
+            position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+            background: var(--paper); border-top: 1px solid var(--line);
+            display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+            padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+            box-shadow: 0 -4px 16px rgba(31,42,37,0.08);
+        }
+        .nav-mobile a {
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            color: var(--muted); font-size: 11.5px; font-weight: 500; padding: 4px 0; border-radius: 10px;
+        }
+        .nav-mobile a.active { color: var(--green); }
+        .nav-mobile a.active svg { background: var(--green-soft); }
+        .nav-mobile svg { width: 22px; height: 22px; padding: 4px; box-sizing: content-box; border-radius: 10px; }
+        body.has-nav { --bottom-nav: 76px; }
+
+        /* ===== ส่วนประกอบทั่วไป ===== */
+        main { padding-top: 28px; padding-bottom: 32px; }
+        .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+        .page-head h2 { font-size: 22px; font-weight: 700; }
+        .page-head p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+        .page-head .date { color: var(--muted); font-size: 14px; }
+
+        .card {
+            background: var(--paper); border: 1px solid var(--line);
+            border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px;
+        }
+        .section-title { font-size: 15px; font-weight: 600; color: var(--muted); letter-spacing: 0.3px; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+        .section-title .count { background: var(--green-soft); color: var(--green); font-size: 12px; padding: 1px 8px; border-radius: 999px; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 11px 18px; border-radius: 12px; border: 1px solid transparent;
+            font-weight: 600; font-size: 15px; cursor: pointer; transition: .15s; text-decoration: none;
+            white-space: nowrap;
+        }
+        .btn svg { width: 18px; height: 18px; }
+        .btn-primary { background: var(--green); color: #fff; }
+        .btn-primary:hover { background: var(--green-dark); }
+        .btn-secondary { background: var(--paper); color: var(--ink); border-color: var(--line); }
+        .btn-secondary:hover { background: var(--bg); }
+        .btn-ghost { background: transparent; color: var(--green); }
+        .btn-ghost:hover { background: var(--green-soft); }
+        .btn-danger { background: var(--red-soft); color: var(--red); }
+        .btn-danger:hover { background: #f5d4cf; }
+        .btn-line { background: var(--line-brand); color: #fff; }
+        .btn-line:hover { filter: brightness(0.93); }
+        .btn-line img { width: 22px; height: 22px; }
+        .btn-sm { padding: 7px 12px; font-size: 14px; border-radius: 10px; }
+        .btn-block { width: 100%; }
+
+        /* ป้ายประเภทงาน */
+        .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; white-space: nowrap; flex: none; }
+        .t-blue { background: var(--blue-soft); color: var(--blue); }
+        .t-yellow { background: var(--pencil-soft); color: #9a6b00; }
+        .t-purple { background: var(--purple-soft); color: var(--purple); }
+        .t-orange { background: var(--orange-soft); color: var(--orange); }
+        .t-red { background: var(--red-soft); color: var(--red); }
+        .t-gray { background: #eceae3; color: var(--muted); }
+
+        /* การ์ดงาน */
+        .ann-grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+        .ann {
+            background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+            box-shadow: var(--shadow); padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 10px;
+            border-left: 5px solid var(--green); position: relative;
+        }
+        .ann.c-blue { border-left-color: var(--blue); }
+        .ann.c-yellow { border-left-color: var(--pencil); }
+        .ann.c-purple { border-left-color: var(--purple); }
+        .ann.c-orange { border-left-color: var(--orange); }
+        .ann.c-red { border-left-color: var(--red); }
+        .ann-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+        .ann-subject { font-weight: 700; font-size: 17px; }
+        .ann-teacher { color: var(--muted); font-size: 13.5px; margin-top: 2px; }
+        .ann-detail { font-size: 15px; white-space: pre-line; overflow-wrap: anywhere; }
+        .ann-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; margin-top: auto; }
+        .ann-meta b { color: var(--ink); font-weight: 600; }
+        .due { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .due-chip { padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+        .due-ok { background: var(--green-soft); color: var(--green); }
+        .due-soon { background: var(--pencil-soft); color: #9a6b00; }
+        .due-late { background: var(--red-soft); color: var(--red); }
+        .ann-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .ann-actions form { margin: 0; }
+
+        .empty { text-align: center; color: var(--muted); padding: 36px 16px; background: var(--paper); border: 1px dashed var(--line); border-radius: var(--radius); }
+        .empty .big { font-size: 34px; margin-bottom: 6px; }
+
+        /* ฟอร์ม */
+        .form-card { max-width: 680px; margin: 0 auto; }
+        .field { margin-bottom: 18px; }
+        .field label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+        .field .hint { font-size: 12.5px; color: var(--muted); margin-top: 5px; }
+        .input, select.input, textarea.input {
+            width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line);
+            background: #fff; font-size: 16px; transition: .15s; outline: none;
+        }
+        .input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+        textarea.input { min-height: 120px; resize: vertical; }
+        select.input { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236e7a74' stroke-width='2' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 38px; }
+        .form-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+        .form-actions .btn { flex: 1; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(20,30,25,0.55); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
+        .modal.open { display: flex; }
+        .modal-box { background: var(--paper); border-radius: var(--radius); padding: 22px; width: 100%; max-width: 420px; box-shadow: var(--shadow-lg); animation: pop .15s ease-out; }
+        .modal-box h3 { font-size: 18px; margin-bottom: 8px; }
+        .modal-box p { margin: 0 0 18px; color: var(--muted); }
+        .modal-actions { display: flex; gap: 10px; }
+        .modal-actions .btn { flex: 1; }
+        .modal-wide { max-width: 560px; max-height: 85vh; overflow-y: auto; }
+        @keyframes pop { from { transform: scale(.96); opacity: 0 } to { transform: none; opacity: 1 } }
+
+        /* ตาราง */
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 13px 14px; text-align: left; border-bottom: 1px solid var(--line); font-size: 15px; }
+        .table th { font-size: 13px; color: var(--muted); font-weight: 600; background: #faf7ef; }
+        .table tr:last-child td { border-bottom: 0; }
+        .table-wrap { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+
+        footer { text-align: center; color: var(--muted); font-size: 12.5px; padding: 8px 16px 20px; }
+
+        /* ===== Tablet / Desktop ===== */
+        @media (min-width: 640px) {
+            .ann-grid { grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+            .form-actions .btn { flex: 0 1 auto; min-width: 150px; }
+        }
+        @media (min-width: 768px) {
+            :root { --gutter: 24px; }
+            .nav-desktop { display: flex; }
+            .nav-mobile { display: none; }
+            body.has-nav { --bottom-nav: 0px; }
+            main { padding-top: 36px; }
+            .page-head h2 { font-size: 26px; }
+            .brand-name { font-size: 20px; }
+        }
+        {% block style %}{% endblock %}
+    </style>
+</head>
+<body class="{% if not public %}has-nav{% endif %}">
+{% set ep = request.endpoint %}
+{% set nav_items = [
+    ('home', '/', 'หน้าหลัก', 'home'),
+    ('add', '/add', 'เพิ่มงาน', 'plus'),
+    ('history', '/history', 'ประวัติ', 'clock'),
+    ('shared_calendar', '/shared-calendar', 'ปฏิทิน', 'calendar')
+] %}
+{% macro icon(name) -%}
+    {%- if name == 'home' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+    {%- elif name == 'plus' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    {%- elif name == 'clock' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    {%- elif name == 'calendar' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+    {%- elif name == 'logout' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M13 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5"/></svg>
+    {%- elif name == 'bell' -%}
+    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2a6 6 0 0 0-6 6v4l-2 3v1h16v-1l-2-3V8a6 6 0 0 0-6-6zm0 20a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22z"/></svg>
+    {%- endif -%}
+{%- endmacro %}
+
+<header class="topbar">
+    <div class="wrap topbar-in">
+        <a class="brand" href="{{ '/shared-calendar' if public else '/' }}">
+            <span class="brand-icon">{{ icon('bell') }}</span>
+            <span class="brand-text">
+                <div class="brand-name">ClassNotify Pro</div>
+                <div class="brand-sub">{% block brand_sub %}{{ room_name }} · ระบบแจ้งการบ้านและงานค้าง{% endblock %}</div>
+            </span>
+        </a>
+        {% if not public %}
+        <nav class="nav-desktop">
+            {% for key, href, label, ic in nav_items %}
+            <a href="{{ href }}" class="{% if ep == key or (key == 'history' and ep == 'history_detail') or (key == 'add' and ep == 'edit') %}active{% endif %}">{{ icon(ic) }}{{ label }}</a>
+            {% endfor %}
+        </nav>
+        <a class="logout" href="/logout">{{ icon('logout') }}<span>ออกจากระบบ</span></a>
+        {% endif %}
+    </div>
+</header>
+
+<main class="wrap">
+    {% block content %}{% endblock %}
+</main>
+
+{% if not public %}
+<nav class="nav-mobile">
+    {% for key, href, label, ic in nav_items %}
+    <a href="{{ href }}" class="{% if ep == key or (key == 'history' and ep == 'history_detail') or (key == 'add' and ep == 'edit') %}active{% endif %}">{{ icon(ic) }}<span>{{ label }}</span></a>
+    {% endfor %}
+</nav>
+{% endif %}
+
+<footer>© 2026 ClassNotify Pro · Produced by PanYaOn coding team</footer>
+{% block script %}{% endblock %}
+</body>
+</html>

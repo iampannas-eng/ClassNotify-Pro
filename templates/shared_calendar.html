@@ -1,489 +1,188 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ปฏิทิน - ClassNotify Pro (หน้าบ้าน)</title>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'IBM Plex Sans Thai', sans-serif;
+{% set public = True %}
+{% extends "base.html" %}
+{% from "_macros.html" import badge, type_color with context %}
+{% block title %}ปฏิทินการบ้าน - ClassNotify Pro{% endblock %}
+{% block brand_sub %}ปฏิทินการบ้าน {{ room_name }}{% endblock %}
+{% block style %}
+        .cal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+        .cal-head h2 { font-size: 20px; }
+        .cal-nav { display: flex; gap: 6px; }
+        .cal-nav .btn { padding: 8px 12px; }
+        .cal-nav .btn svg { width: 16px; height: 16px; }
+        .cal-nav .today-btn { display: none; }
+
+        .cal { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+        .cal-week, .cal-row { display: grid; grid-template-columns: repeat(7, 1fr); }
+        .cal-week div { text-align: center; font-size: 12px; font-weight: 600; color: var(--muted); padding: 8px 0; background: #faf7ef; border-bottom: 1px solid var(--line); }
+        .cal-week div:nth-child(6), .cal-week div:nth-child(7) { color: #b1655a; }
+        .day { min-height: 58px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 6px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; background: transparent; border-top: 0; border-left: 0; cursor: default; font: inherit; color: inherit; }
+        .day:nth-child(7n) { border-right: 0; }
+        .cal-row:last-child .day { border-bottom: 0; }
+        .day.other { background: #f7f4ec; }
+        .day .num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; font-weight: 600; }
+        .day.is-today .num { background: var(--green); color: #fff; }
+        .day.has { cursor: pointer; }
+        .day.has:hover { background: var(--green-soft); }
+        .dots { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; }
+        .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+        .dot.blue { background: var(--blue); } .dot.yellow { background: var(--pencil); } .dot.purple { background: var(--purple); } .dot.orange { background: var(--orange); } .dot.red { background: var(--red); }
+        .day .items { display: none; }
+
+        .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 12px 2px 0; font-size: 12.5px; color: var(--muted); }
+        .legend span { display: inline-flex; align-items: center; gap: 5px; }
+
+        .month-list { margin-top: 24px; }
+        .month-list .section-title { margin-bottom: 10px; }
+        .dl { display: grid; gap: 10px; }
+        .dl .d-head { font-weight: 700; font-size: 14px; color: var(--green); margin: 8px 0 2px; }
+        .dl .row { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start; border-left: 4px solid var(--green); }
+        .dl .row.c-blue { border-left-color: var(--blue); } .dl .row.c-yellow { border-left-color: var(--pencil); } .dl .row.c-purple { border-left-color: var(--purple); } .dl .row.c-orange { border-left-color: var(--orange); } .dl .row.c-red { border-left-color: var(--red); }
+        .dl .row .body { flex: 1; min-width: 0; }
+        .dl .row .s { font-weight: 600; }
+        .dl .row .t { font-size: 13px; color: var(--muted); }
+        .dl .row .dd { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+        .dl .row .det { font-size: 14px; white-space: pre-line; overflow-wrap: anywhere; margin-top: 4px; }
+
+        .modal-box .list { display: grid; gap: 10px; margin-bottom: 14px; }
+
+        @media (min-width: 768px) {
+            .cal-head h2 { font-size: 24px; }
+            .cal-nav .today-btn { display: inline-flex; }
+            .day { min-height: 110px; align-items: stretch; padding: 8px; }
+            .day .num { align-self: flex-start; }
+            .dots { display: none; }
+            .day .items { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+            .day .items span { font-size: 12px; padding: 2px 7px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; font-weight: 500; }
+            .day .items .more { color: var(--muted); font-size: 11.5px; padding-left: 2px; }
+            .legend { display: none; }
+            .month-list { max-width: 760px; }
         }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background: #f5f7fa;
-            color: #2c3e50;
-            min-height: 100vh;
-        }
-
-        .header {
-            background: white;
-            border-bottom: 1px solid #e8eef5;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 600;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 24px auto;
-            padding: 0 16px;
-        }
-
-        .calendar-wrapper {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .calendar-header {
-            background: #5B6FFF;
-            color: white;
-            padding: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .calendar-header h2 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .calendar-nav {
-            display: flex;
-            gap: 12px;
-        }
-
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            font-family: 'IBM Plex Sans Thai', sans-serif;
-        }
-
-        .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .calendar-table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-
-        .weekday {
-            background: #f5f7fa;
-            padding: 12px;
-            font-weight: 600;
-            text-align: center;
-            border-bottom: 2px solid #e8eef5;
-            color: #5B6FFF;
-            width: 14.28%;
-        }
-
-        .day-cell {
-            border: 1px solid #e8eef5;
-            padding: 12px;
-            height: 140px;
-            vertical-align: top;
-            background: white;
-            transition: all 0.2s ease;
-            width: 14.28%;
-            overflow: hidden;
-        }
-
-        .day-cell:hover {
-            background: #f5f7fa;
-        }
-
-        .day-cell.other-month {
-            background: #f9f9f9;
-            color: #bdc3c7;
-        }
-
-        .day-number {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #2c3e50;
-        }
-
-        .day-cell.other-month .day-number {
-            color: #bdc3c7;
-        }
-
-        .day-announcements {
-            font-size: 12px;
-            overflow-y: auto;
-            max-height: 90px;
-        }
-
-        .day-announcement {
-            background: #f0f3ff;
-            color: #5B6FFF;
-            padding: 4px 6px;
-            border-radius: 3px;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .day-announcement:hover {
-            background: #5B6FFF;
-            color: white;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .modal-box {
-            background: white;
-            padding: 24px;
-            border-radius: 8px;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-        }
-
-        .modal-box h3 {
-            margin: 0 0 16px 0;
-            font-size: 18px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .modal-box .card {
-            background: #f5f7fa;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            border-left: 4px solid #5B6FFF;
-        }
-
-        .close-btn {
-            background: white;
-            border: 1px solid #ddd;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 16px;
-        }
-
-        .close-btn:hover {
-            background: #f5f7fa;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 18px;
-            }
-
-            .container {
-                padding: 0 8px;
-                margin: 16px auto;
-            }
-
-            .calendar-header {
-                flex-direction: column;
-                gap: 12px;
-                padding: 16px;
-            }
-
-            .calendar-header h2 {
-                font-size: 20px;
-            }
-
-            .calendar-nav {
-                width: 100%;
-            }
-
-            .nav-btn {
-                flex: 1;
-                padding: 10px 8px;
-                font-size: 13px;
-            }
-
-            .day-cell {
-                height: 100px;
-                padding: 8px;
-                font-size: 12px;
-            }
-
-            .day-number {
-                font-size: 14px;
-                margin-bottom: 4px;
-            }
-
-            .day-announcements {
-                max-height: 60px;
-                font-size: 11px;
-            }
-
-            .day-announcement {
-                font-size: 10px;
-                padding: 2px 4px;
-                margin-bottom: 2px;
-            }
-
-            .modal-box {
-                width: 95%;
-                max-width: 95%;
-                padding: 16px;
-            }
-
-            .modal-box h3 {
-                font-size: 16px;
-            }
-
-            .modal-box .card {
-                padding: 10px;
-                font-size: 12px;
-                margin-bottom: 8px;
-            }
-
-            .close-btn {
-                width: 100%;
-                padding: 10px;
-                font-size: 13px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header {
-                padding: 12px 16px;
-            }
-
-            .header h1 {
-                font-size: 16px;
-            }
-
-            .container {
-                padding: 0 4px;
-                margin: 12px auto;
-            }
-
-            .calendar-header {
-                padding: 12px;
-            }
-
-            .calendar-header h2 {
-                font-size: 18px;
-            }
-
-            .calendar-nav {
-                flex-wrap: wrap;
-            }
-
-            .nav-btn {
-                padding: 8px 6px;
-                font-size: 12px;
-                flex: 0 1 calc(33.33% - 4px);
-            }
-
-            .day-cell {
-                height: 90px;
-                padding: 6px;
-                font-size: 11px;
-            }
-
-            .day-number {
-                font-size: 13px;
-                font-weight: 700;
-                margin-bottom: 2px;
-            }
-
-            .day-announcements {
-                max-height: 55px;
-                font-size: 10px;
-            }
-
-            .day-announcement {
-                font-size: 9px;
-                padding: 2px 3px;
-                margin-bottom: 1px;
-                white-space: normal;
-                overflow: visible;
-                text-overflow: clip;
-            }
-
-            .weekday {
-                padding: 8px 4px;
-                font-size: 12px;
-            }
-
-            .modal-box {
-                width: 98%;
-                padding: 12px;
-            }
-
-            .modal-box h3 {
-                font-size: 15px;
-                margin-bottom: 12px;
-            }
-
-            .modal-box .card {
-                padding: 8px;
-                font-size: 11px;
-                margin-bottom: 6px;
-                border-left-width: 3px;
-            }
-
-            .close-btn {
-                padding: 10px;
-                font-size: 12px;
-                margin-top: 12px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="header">
-        <h1>ClassNotify Pro - ปฏิทินการบ้าน</h1>
+{% endblock %}
+{% block content %}
+<div class="cal-head">
+    <div>
+        <h2>{{ month_name }} {{ year + 543 }}</h2>
     </div>
+    <div class="cal-nav">
+        <a class="btn btn-secondary" href="/shared-calendar?year={{ prev_year }}&month={{ prev_month }}" aria-label="เดือนก่อน">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </a>
+        <a class="btn btn-secondary today-btn" href="/shared-calendar">วันนี้</a>
+        <a class="btn btn-secondary" href="/shared-calendar?year={{ next_year }}&month={{ next_month }}" aria-label="เดือนถัดไป">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+    </div>
+</div>
 
-    <div class="container">
-        <div class="calendar-wrapper">
-            <div class="calendar-header">
-                <h2>{{ month_name }} {{ year }}</h2>
-                <div class="calendar-nav">
-                    <a href="/shared-calendar?year={{ prev_year }}&month={{ prev_month }}">
-                        <button class="nav-btn">← เดือนก่อน</button>
-                    </a>
-                    <a href="/shared-calendar">
-                        <button class="nav-btn">วันนี้</button>
-                    </a>
-                    <a href="/shared-calendar?year={{ next_year }}&month={{ next_month }}">
-                        <button class="nav-btn">เดือนต่อไป →</button>
-                    </a>
-                </div>
+<div class="cal">
+    <div class="cal-week">
+        <div>จ.</div><div>อ.</div><div>พ.</div><div>พฤ.</div><div>ศ.</div><div>ส.</div><div>อา.</div>
+    </div>
+    {% for week in cal %}
+    <div class="cal-row">
+        {% for day in week %}
+            {% if day == 0 %}
+            <div class="day other"></div>
+            {% else %}
+            {% set date_key = "%04d-%02d-%02d"|format(year, month, day) %}
+            {% set items = announcements_by_date.get(date_key, []) %}
+            {% set is_today = (date_key == today.isoformat()) %}
+            <button type="button" class="day {% if items %}has{% endif %} {% if is_today %}is-today{% endif %}" {% if items %}onclick="showDetails('{{ date_key }}')"{% endif %}>
+                <span class="num">{{ day }}</span>
+                {% if items %}
+                <span class="dots">{% for a in items[:4] %}<i class="dot {{ type_color(a.type) }}"></i>{% endfor %}</span>
+                <span class="items">
+                    {% for a in items[:3] %}<span class="t-{{ type_color(a.type) }}">{{ a.subject_name }}</span>{% endfor %}
+                    {% if items|length > 3 %}<span class="more">+{{ items|length - 3 }} รายการ</span>{% endif %}
+                </span>
+                {% endif %}
+            </button>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+<div class="legend">
+    <span><i class="dot blue"></i>การบ้าน</span>
+    <span><i class="dot yellow"></i>งานค้าง</span>
+    <span><i class="dot purple"></i>รายงาน</span>
+    <span><i class="dot orange"></i>โปรเจค</span>
+    <span><i class="dot red"></i>สอบ</span>
+    <span style="margin-left:auto;">แตะวันที่มีจุดเพื่อดูรายละเอียด</span>
+</div>
+
+<section class="month-list">
+    <h3 class="section-title">รายการทั้งหมดในเดือนนี้ <span class="count">{{ announcements_by_date.values()|map('length')|sum }}</span></h3>
+    {% if announcements_by_date %}
+    <div class="dl">
+        {% for date_key, items in announcements_by_date|dictsort %}
+        <div class="d-head">วัน{{ date_key|thaiday }}ที่ {{ date_key|thaidate(false) }}</div>
+        {% for a in items %}
+        <div class="row c-{{ type_color(a.type) }}">
+            <div class="body">
+                <div class="s">{{ a.subject_name }} <span class="t">· {{ a.teacher_name }}</span></div>
+                <div class="det">{{ a.detail }}</div>
+                <div class="dd">กำหนดส่ง {{ a.due_date|thaidate }} ({{ a.due_date|thaiday }})</div>
             </div>
-
-            <table class="calendar-table">
-                <thead>
-                    <tr>
-                        <th class="weekday">จันทร์</th>
-                        <th class="weekday">อังคาร</th>
-                        <th class="weekday">พุธ</th>
-                        <th class="weekday">พฤหัส</th>
-                        <th class="weekday">ศุกร์</th>
-                        <th class="weekday">เสาร์</th>
-                        <th class="weekday">อาทิตย์</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for week in cal %}
-                    <tr>
-                        {% for day in week %}
-                        <td class="day-cell {% if day == 0 %}other-month{% endif %}">
-                            {% if day != 0 %}
-                            <div class="day-number">{{ day }}</div>
-                            <div class="day-announcements">
-                                {% set date_key = "%04d-%02d-%02d"|format(year, month, day) %}
-                                {% if date_key in announcements_by_date %}
-                                    {% for ann in announcements_by_date[date_key] %}
-                                    <div class="day-announcement" onclick="showDetails('{{ date_key }}', this)">
-                                        📌 {{ ann.subject_name }}
-                                    </div>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                            {% endif %}
-                        </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            {{ badge(a.type) }}
         </div>
+        {% endfor %}
+        {% endfor %}
     </div>
+    {% else %}
+    <div class="empty"><div class="big">🌿</div><div>เดือนนี้ยังไม่มีรายการประกาศ</div></div>
+    {% endif %}
+</section>
 
-    <!-- DETAIL MODAL -->
-    <div id="detailModal" class="modal">
-        <div class="modal-box">
-            <h3 id="modalTitle">รายละเอียด</h3>
-            <div id="modalContent"></div>
-            <button class="close-btn" onclick="closeModal()">ปิด</button>
-        </div>
+<!-- รายละเอียดรายวัน -->
+<div id="detailModal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-box modal-wide">
+        <h3 id="modalTitle">รายละเอียด</h3>
+        <div id="modalContent" class="list"></div>
+        <button type="button" class="btn btn-secondary btn-block" onclick="closeModal()">ปิด</button>
     </div>
+</div>
 
-    <!-- ข้อมูลจาก Flask -->
-    <script type="application/json" id="announcements-data">
-{{ announcements_by_date|tojson }}
-    </script>
+<script type="application/json" id="announcements-data">{{ announcements_by_date|tojson }}</script>
+{% endblock %}
+{% block script %}
+<script>
+    const DATA = JSON.parse(document.getElementById('announcements-data').textContent);
+    const COLORS = {'การบ้าน':'blue','งานค้าง':'yellow','รายงาน':'purple','โปรเจค':'orange','สอบเก็บคะแนน':'red','สอบกลางภาค':'red','สอบปลายภาค':'red'};
+    const TH_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    const TH_DAYS = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
 
-    <script>
-        let currentDate = null;
+    function thaiDate(str) {
+        // รับได้ทั้ง "2026-10-20" และรูปแบบ HTTP date ที่ Flask ส่งมาใน JSON
+        const d = new Date(str);
+        if (isNaN(d)) return str;
+        return `${d.getDate()} ${TH_MONTHS[d.getMonth()]} ${d.getFullYear() + 543}`;
+    }
+    function thaiDay(str) { const d = new Date(str); return isNaN(d) ? '' : TH_DAYS[d.getDay()]; }
 
-        function showDetails(dateStr, element) {
-            currentDate = dateStr;
-            const date = new Date(dateStr);
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            const formattedDate = date.toLocaleDateString('th-TH', options);
+    function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
 
-            document.getElementById('modalTitle').textContent = 'งานในวันที่ ' + formattedDate;
-            document.getElementById('detailModal').style.display = 'flex';
-            loadDetails(dateStr);
-        }
-
-        function closeModal() {
-            document.getElementById('detailModal').style.display = 'none';
-        }
-
-        function loadDetails(dateStr) {
-            // ดึงข้อมูลจาก JSON script tag
-            const announcementsJson = document.getElementById('announcements-data').textContent;
-            const announcements = JSON.parse(announcementsJson);
-            
-            if (announcements[dateStr]) {
-                let html = '';
-                announcements[dateStr].forEach(ann => {
-                    html += `
-                    <div class="card">
-                        <strong>${ann.subject_name}</strong> (${ann.type})<br>
-                        ครู: ${ann.teacher_name}<br>
-                        รายละเอียด: ${ann.detail}<br>
-                        ส่งวันที่: ${ann.due_date}
-                    </div>
-                    `;
-                });
-                document.getElementById('modalContent').innerHTML = html;
-            }
-        }
-
-        document.getElementById('detailModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                closeModal();
-            }
+    function showDetails(dateKey) {
+        const items = DATA[dateKey] || [];
+        document.getElementById('modalTitle').textContent = `วัน${thaiDay(dateKey)}ที่ ${thaiDate(dateKey)} · ${items.length} รายการ`;
+        const box = document.getElementById('modalContent');
+        box.innerHTML = '';
+        items.forEach(a => {
+            const row = el('div', 'row c-' + (COLORS[a.type] || 'gray'));
+            row.style.cssText = 'background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 12px;border-left:4px solid var(--' + ({blue:'blue',yellow:'pencil',purple:'purple',orange:'orange',red:'red'}[COLORS[a.type]] || 'green') + ')';
+            const head = el('div'); head.style.cssText = 'display:flex;justify-content:space-between;gap:8px;align-items:flex-start';
+            const s = el('div'); s.appendChild(el('strong', '', a.subject_name)); s.appendChild(el('div', '', a.teacher_name)).style.cssText = 'font-size:13px;color:var(--muted)';
+            head.appendChild(s);
+            head.appendChild(el('span', 'badge t-' + (COLORS[a.type] || 'gray'), a.type));
+            row.appendChild(head);
+            row.appendChild(el('div', '', a.detail)).style.cssText = 'font-size:14px;white-space:pre-line;margin-top:6px;overflow-wrap:anywhere';
+            row.appendChild(el('div', '', 'กำหนดส่ง ' + thaiDate(a.due_date) + ' (' + thaiDay(a.due_date) + ')')).style.cssText = 'font-size:12.5px;color:var(--muted);margin-top:4px';
+            box.appendChild(row);
         });
-    </script>
-</body>
-</html>
+        document.getElementById('detailModal').classList.add('open');
+    }
+    function closeModal() { document.getElementById('detailModal').classList.remove('open'); }
+    document.getElementById('detailModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+{% endblock %}

@@ -1,15 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ส่ง LINE สำเร็จ</title>
-    <style>
-        body { text-align: center; padding: 50px; font-family: Arial; }
-        .success { color: green; font-size: 20px; }
-        a { margin-top: 20px; display: inline-block; padding: 10px 20px; background: blue; color: white; text-decoration: none; border-radius: 5px; }
-    </style>
-</head>
-<body>
-    <h1 class="success">✅ ส่ง LINE สำเร็จ!</h1>
-    <a href="{{ url_for('home') }}">← กลับ Dashboard</a>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}ส่ง LINE สำเร็จ - ClassNotify Pro{% endblock %}
+{% block content %}
+<div class="form-card" style="max-width: 480px; text-align: center; padding-top: 24px;">
+    <div class="card">
+        <div style="width:72px;height:72px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;margin:0 auto 14px;">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h2 style="font-size:22px;">ส่ง LINE สำเร็จ</h2>
+        <p style="color:var(--muted); margin: 6px 0 20px;">สรุปการบ้านและงานค้างของวันนี้ถูกส่งแล้ว</p>
+        <a href="{{ url_for('home') }}" class="btn btn-primary btn-block">กลับหน้าหลัก</a>
+    </div>
+</div>
+{% endblock %}

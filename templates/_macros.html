@@ -1,0 +1,54 @@
+{# ===== macro ใช้ร่วมกันหลายหน้า ===== #}
+
+{% set TYPE_COLORS = {
+    'การบ้าน': 'blue',
+    'งานค้าง': 'yellow',
+    'รายงาน': 'purple',
+    'โปรเจค': 'orange',
+    'สอบเก็บคะแนน': 'red',
+    'สอบกลางภาค': 'red',
+    'สอบปลายภาค': 'red'
+} %}
+
+{% macro type_color(t) -%}{{ TYPE_COLORS.get(t, 'gray') }}{%- endmacro %}
+
+{% macro badge(t) -%}
+<span class="badge t-{{ type_color(t) }}">{{ t }}</span>
+{%- endmacro %}
+
+{% macro due_chip(due_date, today) -%}
+    {% set left = due_date|daysleft(today) %}
+    {% if left is none %}
+    {% elif left < 0 %}<span class="due-chip due-late">เลยกำหนด {{ -left }} วัน</span>
+    {% elif left == 0 %}<span class="due-chip due-late">ส่งวันนี้</span>
+    {% elif left == 1 %}<span class="due-chip due-soon">พรุ่งนี้</span>
+    {% elif left <= 3 %}<span class="due-chip due-soon">อีก {{ left }} วัน</span>
+    {% else %}<span class="due-chip due-ok">อีก {{ left }} วัน</span>
+    {% endif %}
+{%- endmacro %}
+
+{# การ์ดงาน 1 ใบ: row = แถวจาก announcements JOIN subjects #}
+{% macro ann_card(row, today, actions=False, show_announce=True) %}
+<article class="ann c-{{ type_color(row.type) }}">
+    <div class="ann-top">
+        <div>
+            <div class="ann-subject">{{ row.subject_name }}</div>
+            <div class="ann-teacher">{{ row.teacher_name }}</div>
+        </div>
+        {{ badge(row.type) }}
+    </div>
+    <div class="ann-detail">{{ row.detail }}</div>
+    <div class="ann-meta">
+        <span class="due"><b>ส่ง</b> {{ row.due_date|thaidate }} ({{ row.due_date|thaiday }}) {{ due_chip(row.due_date, today) }}</span>
+        {% if show_announce %}<span><b>ประกาศ</b> {{ row.announce_date|thaidate }}</span>{% endif %}
+    </div>
+    {% if actions %}
+    <div class="ann-actions">
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('edit', id=row.id) }}">✏️ แก้ไข</a>
+        <form action="{{ url_for('delete', id=row.id) }}" method="POST" onsubmit="return confirmDelete(event, this);">
+            <button type="submit" class="btn btn-danger btn-sm">🗑 ลบ</button>
+        </form>
+    </div>
+    {% endif %}
+</article>
+{% endmacro %}

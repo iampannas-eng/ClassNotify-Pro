@@ -1,16 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ส่งไม่สำเร็จ</title>
-    <style>
-        body { text-align: center; padding: 50px; font-family: Arial; }
-        .error { color: red; font-size: 20px; }
-        a { margin-top: 20px; display: inline-block; padding: 10px 20px; background: blue; color: white; text-decoration: none; border-radius: 5px; }
-    </style>
-</head>
-<body>
-    <h1 class="error">❌ ส่งไม่สำเร็จ</h1>
-    <p>{{ error }}</p>
-    <a href="{{ url_for('home') }}">← กลับ Dashboard</a>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}ส่ง LINE ไม่สำเร็จ - ClassNotify Pro{% endblock %}
+{% block content %}
+<div class="form-card" style="max-width: 520px; text-align: center; padding-top: 24px;">
+    <div class="card">
+        <div style="width:72px;height:72px;border-radius:50%;background:var(--red-soft);color:var(--red);display:grid;place-items:center;margin:0 auto 14px;">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg>
+        </div>
+        <h2 style="font-size:22px;">ส่ง LINE ไม่สำเร็จ</h2>
+        <p style="color:var(--muted); margin: 6px 0 14px;">LINE ตอบกลับมาดังนี้</p>
+        <pre style="text-align:left; background:#faf7ef; border:1px solid var(--line); border-radius:12px; padding:12px; font-size:13px; white-space:pre-wrap; overflow-wrap:anywhere; margin:0 0 20px;">{{ error }}</pre>
+        <a href="{{ url_for('home') }}" class="btn btn-primary btn-block">กลับหน้าหลัก</a>
+    </div>
+</div>
+{% endblock %}
