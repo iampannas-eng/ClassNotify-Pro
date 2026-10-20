@@ -1,6 +1,6 @@
 {% set public = True %}
 {% extends "base.html" %}
-{% from "_macros.html" import badge, type_color with context %}
+{% from "_macros.html" import badge, type_color, ann_card with context %}
 {% block title %}ปฏิทินการบ้าน - ClassNotify Pro{% endblock %}
 {% block brand_sub %}ปฏิทินการบ้าน {{ room_name }}{% endblock %}
 {% block style %}
@@ -32,17 +32,17 @@
         .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 12px 2px 0; font-size: 12.5px; color: var(--muted); }
         .legend span { display: inline-flex; align-items: center; gap: 5px; }
 
-        .month-list { margin-top: 24px; }
-        .month-list .section-title { margin-bottom: 10px; }
-        .dl { display: grid; gap: 10px; }
-        .dl .d-head { font-weight: 700; font-size: 14px; color: var(--green); margin: 8px 0 2px; }
-        .dl .row { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start; border-left: 4px solid var(--green); }
-        .dl .row.c-blue { border-left-color: var(--blue); } .dl .row.c-yellow { border-left-color: var(--pencil); } .dl .row.c-purple { border-left-color: var(--purple); } .dl .row.c-orange { border-left-color: var(--orange); } .dl .row.c-red { border-left-color: var(--red); }
-        .dl .row .body { flex: 1; min-width: 0; }
-        .dl .row .s { font-weight: 600; }
-        .dl .row .t { font-size: 13px; color: var(--muted); }
-        .dl .row .dd { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
-        .dl .row .det { font-size: 14px; white-space: pre-line; overflow-wrap: anywhere; margin-top: 4px; }
+        .month-list { margin-top: 28px; }
+        .month-list .section-title { margin-bottom: 14px; font-size: 16px; color: var(--ink); }
+        .dl { display: grid; gap: 22px; }
+        .d-group { display: grid; gap: 10px; }
+        .d-head { display: flex; align-items: center; gap: 10px; }
+        .d-head .d-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--green); color: #fff; font-weight: 600; font-size: 13.5px; padding: 5px 12px 5px 8px; border-radius: 999px; box-shadow: var(--shadow); }
+        .d-head .d-pill .n { background: #fff; color: var(--green); width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+        .d-head .d-pill.is-today { background: var(--pencil); color: var(--green-dark); }
+        .d-head .d-pill.is-today .n { background: var(--green-dark); color: #fff; }
+        .d-head .d-line { flex: 1; height: 1px; background: var(--line); }
+        .d-head .d-count { font-size: 12.5px; color: var(--muted); }
 
         .modal-box .list { display: grid; gap: 10px; margin-bottom: 14px; }
 
@@ -117,17 +117,21 @@
     {% if announcements_by_date %}
     <div class="dl">
         {% for date_key, items in announcements_by_date|dictsort %}
-        <div class="d-head">วัน{{ date_key|thaiday }}ที่ {{ date_key|thaidate(false) }}</div>
-        {% for a in items %}
-        <div class="row c-{{ type_color(a.type) }}">
-            <div class="body">
-                <div class="s">{{ a.subject_name }} <span class="t">· {{ a.teacher_name }}</span></div>
-                <div class="det">{{ a.detail }}</div>
-                <div class="dd">กำหนดส่ง {{ a.due_date|thaidate }} ({{ a.due_date|thaiday }})</div>
+        <section class="d-group">
+            <div class="d-head">
+                <span class="d-pill {% if date_key == today.isoformat() %}is-today{% endif %}">
+                    <span class="n">{{ date_key[8:]|int }}</span>
+                    วัน{{ date_key|thaiday }}ที่ {{ date_key|thaidate(false) }}{% if date_key == today.isoformat() %} · วันนี้{% endif %}
+                </span>
+                <span class="d-line"></span>
+                <span class="d-count">{{ items|length }} รายการ</span>
             </div>
-            {{ badge(a.type) }}
-        </div>
-        {% endfor %}
+            <div class="ann-grid">
+                {% for a in items %}
+                    {{ ann_card(a, today, actions=False, show_announce=False) }}
+                {% endfor %}
+            </div>
+        </section>
         {% endfor %}
     </div>
     {% else %}
