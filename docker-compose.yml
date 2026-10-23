@@ -43,6 +43,22 @@ services:
       timeout: 5s
       retries: 3
 
+  # ส่งออก /api/today เป็น today.json ไปที่ Gist (URL คงที่) ทุก 5 นาที สำหรับจอทีวีในห้องเรียน
+  # ต้องมี GIST_TOKEN ใน .env จึงจะอัปโหลด; ไม่มีก็ยังเขียน export/today.json ไว้ในเครื่อง
+  exporter:
+    build: .
+    container_name: classnotify-exporter
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      TZ: Asia/Bangkok
+    depends_on:
+      app:
+        condition: service_healthy
+    command: ["python", "scripts/export_today.py"]
+    volumes:
+      - ./export:/app/export
+
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: classnotify-tunnel

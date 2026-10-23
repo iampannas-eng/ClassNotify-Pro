@@ -30,3 +30,6 @@ ENV/
 # Backups (สร้างโดย scripts/backup.sh)
 backups/
 *.sql.gz
+
+# สร้างโดย exporter
+export/

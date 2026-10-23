@@ -140,3 +140,10 @@ docker compose restart cloudflared       # ถ้า tunnel หลุด
 ```
 
 ตารางเวลา: ทุกอย่างอยู่ใน Asia/Bangkok แล้ว (ทั้ง container และโค้ด)
+
+## ส่งข้อมูลให้จอทีวีในห้องเรียน
+
+- `GET /api/today` คืน JSON งานที่ครบกำหนดวันนี้และใน 7 วัน (ไม่ต้องล็อกอิน)
+- service `exporter` (scripts/export_today.py) เขียน `export/today.json` ทุก 5 นาที และถ้ามี `GIST_TOKEN` ใน .env จะอัปโหลดขึ้น Gist ส่วนตัว (URL คงที่) ให้กล่องทีวีอ่านได้จากทุกเครือข่าย
+- ครั้งแรกที่มี token สคริปต์จะสร้าง Gist เองและเขียน URL ไว้ที่ `export/gist_url.txt` นำ URL นั้นไปใส่ในกล่องทีวี (ไฟล์ homework_url.txt)
+- หลังแก้ .env ต้องสร้าง container ใหม่: `docker compose up -d --force-recreate exporter`

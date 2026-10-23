@@ -247,6 +247,64 @@ def health():
         return {"status": "error", "detail": str(e)}, 500
 
 
+def _split_subject(name):
+    """'คณิตศาสตร์ (ค31224)' -> ('คณิตศาสตร์', 'ค31224'); ชื่อที่ไม่มีวงเล็บคืนรหัสว่าง"""
+    name = (name or "").strip()
+    if name.endswith(")") and "(" in name:
+        base, code = name.rsplit("(", 1)
+        return base.strip(), code[:-1].strip()
+    return name, ""
+
+
+def _announcement_dict(row, today):
+    subject, code = _split_subject(row["subject_name"])
+    due = _to_date(row["due_date"])
+    return {
+        "id": row["id"],
+        "type": row["type"],
+        "subject": subject,
+        "code": code,
+        "teacher": row["teacher_name"],
+        "detail": row["detail"],
+        "announce_date": str(_to_date(row["announce_date"])),
+        "due_date": str(due),
+        "days_left": (due - today).days,
+    }
+
+
+@app.route("/api/today")
+def api_today():
+    """JSON อ่านอย่างเดียวสำหรับจอทีวีในห้องเรียน: งานที่ครบกำหนดส่งวันนี้ และงานที่จะถึงใน 7 วัน
+    ไม่ต้องล็อกอิน (ข้อมูลชุดเดียวกับปฏิทินสาธารณะ) ใช้เวลาไทยเสมอ"""
+    now = thai_now()
+    today = now.date()
+    horizon = today + timedelta(days=7)
+
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("""
+        SELECT announcements.*, subjects.subject_name, subjects.teacher_name
+        FROM announcements
+        JOIN subjects ON announcements.subject_id = subjects.id
+        WHERE due_date BETWEEN %s AND %s
+        ORDER BY due_date ASC, announcements.id ASC
+    """, (today, horizon))
+    rows = [_announcement_dict(r, today) for r in cur.fetchall()]
+    cur.close()
+    conn.close()
+
+    due_today = [r for r in rows if r["days_left"] == 0]
+    upcoming = [r for r in rows if r["days_left"] > 0]
+    return {
+        "generated_at": now.isoformat(timespec="seconds"),
+        "date": str(today),
+        "room": "ห้อง 4/15",
+        "today": due_today,
+        "tomorrow_count": sum(1 for r in upcoming if r["days_left"] == 1),
+        "upcoming": upcoming[:10],
+    }
+
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
