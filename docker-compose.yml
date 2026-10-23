@@ -37,13 +37,15 @@ services:
     # ถ้าจะให้เข้าได้แค่ผ่าน Cloudflare ให้เปลี่ยนเป็น "127.0.0.1:8000:8000"
     ports:
       - "8000:8000"
+    volumes:
+      - ./export:/app/export   # แชร์กับ exporter เพื่อส่งสัญญาณ "ข้อมูลเปลี่ยน"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).status==200 else 1)\""]
       interval: 30s
       timeout: 5s
       retries: 3
 
-  # ส่งออก /api/today เป็น today.json ไปที่ Gist (URL คงที่) ทุก 5 นาที สำหรับจอทีวีในห้องเรียน
+  # ส่งออก /api/today เป็น today.json ไปที่ Gist (URL คงที่) ทุก 1 นาที และทันทีที่มีการแก้ประกาศ
   # ต้องมี GIST_TOKEN ใน .env จึงจะอัปโหลด; ไม่มีก็ยังเขียน export/today.json ไว้ในเครื่อง
   exporter:
     build: .

@@ -90,6 +90,18 @@ def get_db():
     conn = psycopg2.connect(DATABASE_URL)
     return conn
 
+
+def notify_exporter():
+    """บอก service exporter ว่าข้อมูลเปลี่ยน ให้ส่งออกไปยังจอทีวีทันที (ไม่ต้องรอรอบ 1 นาที)
+    ใช้ไฟล์ธงในโฟลเดอร์ export ที่ทั้งสอง container แชร์กัน; ถ้าเขียนไม่ได้ก็ข้ามไปเงียบๆ"""
+    try:
+        export_dir = os.environ.get("EXPORT_DIR", "export")
+        os.makedirs(export_dir, exist_ok=True)
+        with open(os.path.join(export_dir, ".changed"), "w") as f:
+            f.write(thai_now().isoformat())
+    except Exception:
+        pass
+
 @app.route("/")
 def index():
     """หน้าแรกสาธารณะ = ปฏิทินการบ้าน (ไม่ต้องล็อกอิน)"""
@@ -177,6 +189,7 @@ def add():
         conn.commit()
         cur.close()
         conn.close()
+        notify_exporter()
         return redirect(url_for("home"))
 
     cur.execute("SELECT * FROM subjects ORDER BY id ASC")
@@ -367,6 +380,7 @@ def delete(id):
     conn.commit()
     cur.close()
     conn.close()
+    notify_exporter()
 
     return redirect(url_for("home"))
 
@@ -393,6 +407,7 @@ def edit(id):
         conn.commit()
         cur.close()
         conn.close()
+        notify_exporter()
         return redirect(url_for("home"))
 
     cur.execute("SELECT * FROM announcements WHERE id = %s", (id,))

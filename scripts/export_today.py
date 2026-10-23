@@ -4,7 +4,8 @@
 จึงให้ฝั่ง Dell เป็นผู้ "ส่งออก" ข้อมูลไปที่ Gist ซึ่งมี URL คงที่ แล้วกล่องอ่านจากที่เดียวตลอด
 
 การทำงาน (รันเป็น service `exporter` ใน docker-compose):
-  - ทุก EXPORT_INTERVAL วินาที (ค่าเริ่มต้น 300) ดึง http://app:8000/api/today
+  - ทุก EXPORT_INTERVAL วินาที (ค่าเริ่มต้น 60) ดึง http://app:8000/api/today
+    และทันทีที่แอปเขียนไฟล์ธง export/.changed (หลังเพิ่ม/แก้/ลบประกาศ)
   - เขียนลง export/today.json เสมอ (มีประโยชน์เวลาอยู่วงแลนเดียวกัน หรือเอาไปใช้ทางอื่น)
   - ถ้ามี GIST_TOKEN ใน .env: อัปเดต Gist (สร้างใหม่ครั้งแรกแล้วจำ id ไว้ใน export/gist_id.txt)
     และอัปโหลดเฉพาะเมื่อเนื้อหาเปลี่ยน เพื่อไม่ให้ชน rate limit ของ GitHub
@@ -21,7 +22,7 @@ from pathlib import Path
 import requests
 
 API_URL = os.environ.get("EXPORT_SOURCE_URL", "http://app:8000/api/today")
-INTERVAL = int(os.environ.get("EXPORT_INTERVAL", "300"))
+INTERVAL = int(os.environ.get("EXPORT_INTERVAL", "60"))
 EXPORT_DIR = Path(os.environ.get("EXPORT_DIR", "export"))
 GIST_TOKEN = os.environ.get("GIST_TOKEN", "").strip()
 GIST_ID = os.environ.get("GIST_ID", "").strip()
@@ -105,17 +106,32 @@ def run_once(last_hash: str) -> str:
     return digest
 
 
+CHANGED_FLAG = EXPORT_DIR / ".changed"   # แอปเขียนไฟล์นี้เมื่อมีการเพิ่ม/แก้/ลบประกาศ
+POLL_SECONDS = 3
+
+
 def main() -> None:
     once = "--once" in sys.argv
     last_hash = ""
+    last_run = 0.0
     while True:
-        try:
-            last_hash = run_once(last_hash)
-        except Exception as e:  # ห้ามให้ service ตายเพราะเน็ตหลุดชั่วคราว
-            log(f"ผิดพลาด: {e}")
-        if once:
-            break
-        time.sleep(INTERVAL)
+        changed = CHANGED_FLAG.exists()
+        due = (time.time() - last_run) >= INTERVAL
+        if changed or due or last_run == 0.0:
+            if changed:
+                try:
+                    CHANGED_FLAG.unlink()
+                except OSError:
+                    pass
+                log("ข้อมูลเปลี่ยน: ส่งออกทันที")
+            try:
+                last_hash = run_once(last_hash)
+            except Exception as e:  # ห้ามให้ service ตายเพราะเน็ตหลุดชั่วคราว
+                log(f"ผิดพลาด: {e}")
+            last_run = time.time()
+            if once:
+                break
+        time.sleep(POLL_SECONDS)
 
 
 if __name__ == "__main__":
